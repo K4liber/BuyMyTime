@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html
+	xmlns="http//www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Home Page</title>
+</head>
+<body>
+	<header id="header" class="alt" th:include="header :: headerMenu"></header>
+	
+	<form method="POST" enctype="multipart/form-data" th:object="${user}">
+		<table>
+			<tr>
+				<td>
+					<label>Nick</label>:
+					<input type="text" th:field="*{nick}" /><br/>
+				</td>
+				<td th:if="${#fields.hasErrors('nick')}" th:errors="*{nick}">Nick Error</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Password</label>:
+					<input type="password" th:field="*{password}" /><br/>
+				</td>
+				<td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Confirm Password</label>:
+					<input type="password" th:field="*{confirmPassword}" /><br/>
+				</td>
+				<td th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}">Confirm Password Error</td>
+			</tr>
+			<tr>
+				<td>
+					<label>E-mail</label>:
+					<input type="text" th:field="*{email}" /><br/>
+				</td>
+				<td th:if="${#fields.hasErrors('email')}" th:errors="*{email}">E-mail Error</td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="Register" /></td>
+			</tr>
+		</table>
+	</form>
+	
+	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
+</body>
+</html>
