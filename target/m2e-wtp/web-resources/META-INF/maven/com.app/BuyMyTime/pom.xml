@@ -12,6 +12,31 @@
 	</properties>
   <dependencies>
   	<dependency>
+	    <groupId>javax.persistence</groupId>
+	    <artifactId>persistence-api</artifactId>
+	    <version>1.0</version>
+	</dependency>
+  	<dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-core</artifactId>
+	    <version>5.1.0.Final</version>
+	</dependency>	
+  	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>5.1.6</version>
+	</dependency>
+  	<dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-entitymanager</artifactId>
+	    <version>5.1.0.Final</version>
+	</dependency>
+  	<dependency>
+	    <groupId>org.springframework.data</groupId>
+	    <artifactId>spring-data-jpa</artifactId>
+	    <version>1.10.2.RELEASE</version>
+	</dependency>
+  	<dependency>
 	    <groupId>org.hibernate</groupId>
 	    <artifactId>hibernate-validator</artifactId>
 	    <version>5.0.1.Final</version>
@@ -63,8 +88,39 @@
 		    <artifactId>spring-beans</artifactId>
 		    <version>${spring.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-aop</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-jdbc</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-orm</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-tx</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
   </dependencies>
   <build>
     <finalName>BuyMyTime</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
