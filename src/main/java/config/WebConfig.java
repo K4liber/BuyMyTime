@@ -17,7 +17,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("web")
+@ComponentScan(basePackages={"web"})
 public class WebConfig extends WebMvcConfigurerAdapter{
 	
 	@Bean

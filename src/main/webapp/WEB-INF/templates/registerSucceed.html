@@ -8,13 +8,10 @@
 </head>
 <body>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
-	<div th:if="${session != null && session.user != null}" >
-		<a th:href="@{/logout}">Logout</a>
-	</div>
-	<div th:unless="${session != null && session.user != null}">
-		<a th:href="@{/register}">Register</a>
-		<a th:href="@{/login}">Login</a>
-	</div>
+	
+	<div th:object="${user}">Hello <span th:text="*{nick}"></span>! Registration succeed! </div>
+	<a th:href="@{/login}">Login</a>
+	
 	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
 </body>
 </html>

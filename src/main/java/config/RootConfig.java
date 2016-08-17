@@ -18,6 +18,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import web.SessionListener;
+
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages={"data"})
@@ -26,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 		@Filter(type=FilterType.ANNOTATION, value = EnableWebMvc.class)
 })
 public class RootConfig{
-
+	
     @Bean
     public DataSource dataSource() {
             DriverManagerDataSource dataSource = new DriverManagerDataSource();
