@@ -35,6 +35,12 @@ public class UserController {
 			BindingResult bindingResult, RedirectAttributes model) throws IllegalStateException, IOException{
 		if(!user.getConfirmPassword().equals(user.getPassword()))
 			bindingResult.rejectValue("confirmPassword", "error.confirmPassword", "confirm password not match");
+		
+		if(userRepository.findByNick(user.getNick()) != null)
+			bindingResult.rejectValue("nick", "error.user", "this nick already in use");
+		
+		if(userRepository.findByEmail(user.getEmail()) != null)
+			bindingResult.rejectValue("email", "error.user", "this email already in use");
 
 		if(bindingResult.hasErrors())
 			return "registerForm";
