@@ -1,18 +1,16 @@
 package web;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -43,13 +41,17 @@ public class UserController {
 	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logoutRequest(HttpSession session){
-		User user;
 		if(session.getAttribute("user") != null){
-			user = (User) session.getAttribute("user");
-			userRepository.setStatusForUser(false, user.getId());
 			session.removeAttribute("user");
 		}
 		return "home";
+	}
+	
+	@RequestMapping(value="/profile/{userNick}", method=RequestMethod.GET)
+	public String showProfile(@PathVariable("userNick") String userNick, Model model){
+		User user = userRepository.findByNick(userNick);
+		model.addAttribute("user", user);
+		return "profile";
 	}
 	
 	@RequestMapping(value="/register", method=RequestMethod.POST)
@@ -88,7 +90,6 @@ public class UserController {
 			return "loginForm";
 		
 		session.setAttribute("user", user);
-		userRepository.setStatusForUser(true, user.getId());
 	    return "home";
 	}
 	

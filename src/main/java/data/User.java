@@ -38,13 +38,11 @@ public class User implements HttpSessionBindingListener{
 	@Email
 	private String email;
 	
-	private boolean status;
-	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -78,14 +76,6 @@ public class User implements HttpSessionBindingListener{
 
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
-	}
-
-	public boolean isStatus() {
-		return status;
-	}
-
-	public void setStatus(boolean status) {
-		this.status = status;
 	}
 
 	@Override
