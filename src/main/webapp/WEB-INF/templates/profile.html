@@ -10,6 +10,13 @@
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	
 	<h1>User <span th:text="${user.nick}">Nick</span> Profile</h1>
+	<div th:if="${status}"> <!-- if customer is anonymous-->
+	   <div>Online</div>
+	</div>
+	
+	<div th:unless="${status}"> <!-- if customer is not anonymous(logged in)-->
+	   <div>Offline</div>
+	</div>
 	
 	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
 </body>

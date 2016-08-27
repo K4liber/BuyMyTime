@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html
+	xmlns="http//www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Home Page</title>
+</head>
+<body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+    <script type="text/javascript">
+	    
+    
+    	var sock2 = new SockJS('http://localhost:8080/BuyMyTime/greeting');
+    	
+    	sock2.onmessage = function(e) {
+    	    console.log('message', e.data);
+    	    console.log("message");
+    	}
+    	
+    	sock2.onopen = function(e) {
+    		var msg = {msg: "hello"};
+    	    sock2.send(msg); // 1. example
+    	    sock2.send(JSON.stringify(msg)); // 2.example
+    	    sock2.send("meessssage");
+    		console.log("OPEN");
+    	}
+    	
+    	sock2.onclose = function(e) {
+    		var msg = {msg: "hello"};
+    	    sock2.send(msg); // 1. example
+    	    sock2.send(JSON.stringify(msg)); // 2.example
+    	    sock2.send("meessssage");
+    		console.log("CLOSE");
+    	}
+    	
+    	var sock = new SockJS("http://localhost:8080/BuyMyTime/greeting");
+        var stomp = Stomp.over(sock);
+        var payload = JSON.stringify({'name':'Jasiek'});
+        stomp.connect('quest', 'quest', function(frame){
+        	console.log("Connected");
+            stomp.send("/greeting", {}, payload);
+        });
+
+    </script>
+	<header id="header" class="alt" th:include="header :: headerMenu"></header>
+	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
+</body>
+</html>

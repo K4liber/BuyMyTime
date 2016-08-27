@@ -101,4 +101,8 @@ public class User implements HttpSessionBindingListener{
     public void valueUnbound(HttpSessionBindingEvent event) {
         logins.remove(this);
     }
+    
+    public boolean isLogged(){
+		return logins.containsKey(this);
+    }
 }

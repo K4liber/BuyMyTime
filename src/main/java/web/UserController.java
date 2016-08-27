@@ -42,15 +42,24 @@ public class UserController {
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logoutRequest(HttpSession session){
 		if(session.getAttribute("user") != null){
-			session.removeAttribute("user");
+			session.invalidate();
 		}
 		return "home";
+	}
+	
+	@RequestMapping(value="/cam", method=RequestMethod.GET)
+	public String camSession(HttpSession session){
+		if(session.getAttribute("user") != null){
+			session.invalidate();
+		}
+		return "cam";
 	}
 	
 	@RequestMapping(value="/profile/{userNick}", method=RequestMethod.GET)
 	public String showProfile(@PathVariable("userNick") String userNick, Model model){
 		User user = userRepository.findByNick(userNick);
 		model.addAttribute("user", user);
+		model.addAttribute("status", user.isLogged());
 		return "profile";
 	}
 	
