@@ -2,7 +2,27 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
 	<script type="text/javascript">
-    	//var socketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
+	if(subscribeSocketJS === undefined)
+		var subscribeSocketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
+	if(subscribeStomp === undefined){
+		var subscribeStomp = Stomp.over(subscribeSocketJS);
+		subscribeStomp.connect('guest', 'guest', function(frame){
+	    	console.log("Connected to subsriber.");
+	     	subscribeStomp.subscribe('/user/queue/reply', handleIncoming);
+	    });
+	}
+    function handleIncoming(incoming){
+    	var message = JSON.parse(incoming.body);
+    	console.log('Subsribing message: ', message);
+    	alert("Calling from " + message.name);
+    }
+     
+    function call(){
+    	var nick = document.getElementById("username").innerText;
+	    var callMessage = {'name': nick};
+        var payload = JSON.stringify(callMessage);
+        subscribeStomp.send("/BuyMyTime/marco", {}, payload);      
+    }
    	</script>
 	<h1>
 		<a th:href="@{/}">Home Page</a>

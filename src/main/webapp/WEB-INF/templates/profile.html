@@ -8,27 +8,6 @@
 </head>
 <body>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
-	<script type="text/javascript">
-	    
-		function call() {
-			var socketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
-		    var nick = document.getElementById("username").innerText;
-		    var callMessage = {'name': nick};
-		    var stomp = Stomp.over(socketJS);
-	        var payload = JSON.stringify(callMessage);
-	        stomp.connect('guest', 'guest', function(frame){
-	        	console.log("Connected");
-	            stomp.send("/BuyMyTime/marco", {}, payload);
-	            stomp.subscribe("/topic/shout", handleMessage);
-	        });
-		}
-		
-        function handleMessage(incoming){
-        	var message = JSON.parse(incoming.body);
-        	console.log('Received: ', message);
-        }
-    	
-    </script>
 	<h1>User <span id="username" th:text="${user.username}">Nick</span> Profile</h1>
 	<div th:if="${status}"> <!-- if customer is anonymous-->
 	   <div>Online</div>
