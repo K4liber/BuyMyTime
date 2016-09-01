@@ -1,12 +1,17 @@
 package web;
 
 import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +27,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 public class UserController {
+	
+	@Autowired
+	private SessionRegistry sessionRegistry;
 	
 	@Autowired
 	UserRepository userRepository;
@@ -53,11 +61,18 @@ public class UserController {
 		return "cam";
 	}
 	
-	@RequestMapping(value="/profile/{userNick}", method=RequestMethod.GET)
-	public String showProfile(@PathVariable("userNick") String userNick, Model model){
+	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
+	public String showProfile(@PathVariable("username") String userNick, Model model){
+		List<Object> principals = sessionRegistry.getAllPrincipals();
+		List<String> usersNamesList = new ArrayList<String>();
+		for (Object principal: principals) {
+		    if (principal instanceof UserDetails) {
+		        usersNamesList.add(((UserDetails) principal).getUsername());
+		    }
+		}
 		User user = userRepository.findByUsername(userNick);
 		model.addAttribute("user", user);
-		model.addAttribute("status", user.isLogged());
+		model.addAttribute("status", usersNamesList.contains(userNick));
 		return "profile";
 	}
 	

@@ -1,9 +1,9 @@
 package web;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,13 @@ import data.CardTag;
 import data.TagToCard;
 import data.TagToCardRepository;
 import data.User;
+import data.UserRepository;
 
 @Controller
 public class CardController {
 	
+	@Autowired
+	UserRepository userRepository;
 	@Autowired
 	CardRepository cardRepository;
 	@Autowired
@@ -51,7 +54,7 @@ public class CardController {
 	
 	@RequestMapping(value = { "/newcard" }, method = RequestMethod.POST)
 	public String login(HttpServletRequest request, @ModelAttribute(value="cardModel") @Valid CardModel cardModel,
-			BindingResult bindingCardModelResult, RedirectAttributes model) throws Exception {
+			BindingResult bindingCardModelResult, RedirectAttributes model, Principal principal) throws Exception {
 
 		if(bindingCardModelResult.hasErrors()){
 			System.out.println(bindingCardModelResult.toString());
@@ -59,8 +62,7 @@ public class CardController {
 		}
 		
 		Card cardFromModel = cardModel.getCard();
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+		User user = userRepository.findByUsername(principal.getName());
 		cardFromModel.setUserId(user.getId());
 		cardFromModel.setUserNick(user.getUsername());
 		Card savedCard = cardRepository.save(cardModel.getCard());

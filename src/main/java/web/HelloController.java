@@ -20,7 +20,7 @@ public class HelloController {
     @MessageMapping("/marco")
     @SendTo("/topic/shout")
     public HelloMessage greeting(Principal principal, HelloMessage message) throws InterruptedException{
-        System.out.println("Wiadomosc: " + message.getName() + "od: " + principal.getName());   
+        System.out.println("Dzwoni do: " + message.getName() + " od: " + principal.getName());   
         HelloMessage returnMessage = new HelloMessage();
         returnMessage.setName("Polo");
         return returnMessage;
