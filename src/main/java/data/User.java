@@ -25,7 +25,7 @@ public class User implements HttpSessionBindingListener{
 	 
 	@NotNull
 	@Size(min=5, max=16)
-	private String nick;
+	private String username;
 	
 	@NotNull
 	@Size(min=5, max=16)
@@ -38,6 +38,9 @@ public class User implements HttpSessionBindingListener{
 	@Email
 	private String email;
 	
+	@NotNull
+	private boolean enabled;
+	
 	public Long getId() {
 		return id;
 	}
@@ -46,12 +49,12 @@ public class User implements HttpSessionBindingListener{
 		this.id = id;
 	}
 
-	public String getNick() {
-		return nick;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setNick(String nick) {
-		this.nick = nick;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
@@ -105,4 +108,12 @@ public class User implements HttpSessionBindingListener{
     public boolean isLogged(){
 		return logins.containsKey(this);
     }
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 }

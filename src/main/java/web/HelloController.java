@@ -1,5 +1,10 @@
 package web;
 
+import java.security.Principal;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -12,18 +17,20 @@ import org.springframework.messaging.simp.annotation.*;
 public class HelloController {
 
 
-    @MessageMapping("/greeting")
-    public void greeting(HelloMessage message) throws InterruptedException{
-    	Thread.sleep(60000);
-        System.out.println("Wiadomosc: " + message.getName());
+    @MessageMapping("/marco")
+    @SendTo("/topic/shout")
+    public HelloMessage greeting(Principal principal, HelloMessage message) throws InterruptedException{
+        System.out.println("Wiadomosc: " + message.getName() + "od: " + principal.getName());   
+        HelloMessage returnMessage = new HelloMessage();
+        returnMessage.setName("Polo");
+        return returnMessage;
     }
     
     @SubscribeMapping({"/greeting"})
-    public HelloMessage handleSubscription() {
+    public void handleSubscription() {
     	HelloMessage outgoing = new HelloMessage();
     	System.out.println("SUB");
     	outgoing.setName("Jas");
-    	return outgoing;
     }
     
 }

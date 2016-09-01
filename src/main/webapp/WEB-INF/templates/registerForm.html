@@ -14,9 +14,9 @@
 			<tr>
 				<td>
 					<label>Nick</label>:
-					<input type="text" th:field="*{nick}" /><br/>
+					<input type="text" th:field="*{username}" /><br/>
 				</td>
-				<td th:if="${#fields.hasErrors('nick')}" th:errors="*{nick}">Nick Error</td>
+				<td th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username Error</td>
 			</tr>
 			<tr>
 				<td>

@@ -8,10 +8,21 @@
 </head>
 <body>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
-	
-	<h1>User <span th:text="${user.nick}">Nick</span> Profile</h1>
+	<script type="text/javascript">
+	    
+		function call() {
+		    var nick = document.getElementById("userNick").innerText;
+		    var callMessage = {fromNick: nick};
+		    socketJS.send(JSON.stringify(callMessage));
+		}
+    	
+    </script>
+	<h1>User <span id="userNick" th:text="${user.nick}">Nick</span> Profile</h1>
 	<div th:if="${status}"> <!-- if customer is anonymous-->
 	   <div>Online</div>
+	   <button onclick="call()" type="submit" style="border: 0; background: transparent">
+	  	 <img th:src="@{/resources/img/phone.png}" style="width: 20px"/>
+	   </button>
 	</div>
 	
 	<div th:unless="${status}"> <!-- if customer is not anonymous(logged in)-->

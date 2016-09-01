@@ -13,7 +13,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Class[] getRootConfigClasses() {
-		return new Class[] { RootConfig.class, WebSocketConfig.class };
+		return new Class[] { RootConfig.class, WebSocketConfig.class, SecurityConfig.class};
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

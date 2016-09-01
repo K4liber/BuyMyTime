@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import data.User;
-import data.UserLoginModel;
 import data.UserRepository;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,7 +34,6 @@ public class UserController {
 	
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String showLoginForm( Model model){
-		model.addAttribute("userLoginModel", new UserLoginModel());
 		return "loginForm";
 	}
 	
@@ -57,7 +55,7 @@ public class UserController {
 	
 	@RequestMapping(value="/profile/{userNick}", method=RequestMethod.GET)
 	public String showProfile(@PathVariable("userNick") String userNick, Model model){
-		User user = userRepository.findByNick(userNick);
+		User user = userRepository.findByUsername(userNick);
 		model.addAttribute("user", user);
 		model.addAttribute("status", user.isLogged());
 		return "profile";
@@ -70,8 +68,8 @@ public class UserController {
 		if(!user.getConfirmPassword().equals(user.getPassword()))
 			bindingResult.rejectValue("confirmPassword", "error.confirmPassword", "confirm password not match");
 		
-		if(userRepository.findByNick(user.getNick()) != null)
-			bindingResult.rejectValue("nick", "error.user", "this nick already in use");
+		if(userRepository.findByUsername(user.getUsername()) != null)
+			bindingResult.rejectValue("username", "error.user", "this username already in use");
 		
 		if(userRepository.findByEmail(user.getEmail()) != null)
 			bindingResult.rejectValue("email", "error.user", "this email already in use");
@@ -82,24 +80,6 @@ public class UserController {
 		userRepository.save(user);
 		model.addFlashAttribute(user);		
 		return "registerSucceed";
-	}
-	
-	@RequestMapping(value = { "/login" }, method = RequestMethod.POST)
-	public String login(HttpServletRequest request,@ModelAttribute(value="userLoginModel") @Valid UserLoginModel userLoginModel,
-			BindingResult bindingResult, RedirectAttributes model) throws Exception {
-		HttpSession session = request.getSession();
-		User user = userRepository.findByNick(userLoginModel.getNick());
-		if(user == null )
-			bindingResult.rejectValue("nick", "error.userLoginModel", "nick not found");
-		
-		if(user != null && !user.getPassword().equals(userLoginModel.getPassword()))
-			bindingResult.rejectValue("password", "error.userLoginModel", "wrong password");
-		
-		if(bindingResult.hasErrors())
-			return "loginForm";
-		
-		session.setAttribute("user", user);
-	    return "home";
 	}
 	
 }

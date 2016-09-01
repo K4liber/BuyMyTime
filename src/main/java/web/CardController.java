@@ -62,7 +62,7 @@ public class CardController {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 		cardFromModel.setUserId(user.getId());
-		cardFromModel.setUserNick(user.getNick());
+		cardFromModel.setUserNick(user.getUsername());
 		Card savedCard = cardRepository.save(cardModel.getCard());
 		
 		String tagsTable[] = cardModel.getTags().split(" ");
