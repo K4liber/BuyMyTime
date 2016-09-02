@@ -25,6 +25,8 @@ import data.UserRepository;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.google.gson.Gson;
+
 @Controller
 public class UserController {
 	
@@ -60,6 +62,20 @@ public class UserController {
 		}
 		return "cam";
 	}
+	
+	@RequestMapping(value="/cam/{username}", method=RequestMethod.GET)
+    public String getForDay(@PathVariable("username") String username, Model model, Principal principal) {
+		model.addAttribute("username", username);
+		model.addAttribute("yourid", principal.getName());
+		return "cam";
+    }
+	
+	@RequestMapping(value="/video/{id}", method=RequestMethod.GET)
+    public String calling(@PathVariable("id") String id, Model model, Principal principal) {
+		model.addAttribute("id", id);
+		model.addAttribute("yourid", principal.getName());
+		return "video";
+    }
 	
 	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
 	public String showProfile(@PathVariable("username") String userNick, Model model){

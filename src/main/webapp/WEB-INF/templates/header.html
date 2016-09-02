@@ -1,6 +1,9 @@
 <header th:fragment="headerMenu">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+    <link rel="stylesheet" th:href="@{/resources/css/style.css}">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+    <script th:src="@{/resources/js/peer.js}"></script>
 	<script type="text/javascript">
 	if(subscribeSocketJS === undefined)
 		var subscribeSocketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
@@ -9,20 +12,42 @@
 		subscribeStomp.connect('guest', 'guest', function(frame){
 	    	console.log("Connected to subsriber.");
 	     	subscribeStomp.subscribe('/user/queue/reply', handleIncoming);
+	     	subscribeStomp.subscribe('/user/queue/accept', handleAccept);
 	    });
 	}
+	
     function handleIncoming(incoming){
     	var message = JSON.parse(incoming.body);
     	console.log('Subsribing message: ', message);
-    	alert("Calling from " + message.name);
+    	if(confirm("Calling from " + message.name + "! Would you like to answer?")){
+    		console.log("Nawiazuje polaczenie!");
+    		window.location.href = '/BuyMyTime/cam/' + message.name;
+    	}else{
+    		console.log("Nie nawiazuje!");
+    	};
     }
-     
+    
+    function handleAccept(accept){
+    	var message = JSON.parse(accept.body);
+    	console.log('Accepted connection with id: ', message.id);
+    	window.location.href = '/BuyMyTime/video/' + message.id;
+    }
+    
     function call(){
     	var nick = document.getElementById("username").innerText;
 	    var callMessage = {'name': nick};
         var payload = JSON.stringify(callMessage);
         subscribeStomp.send("/BuyMyTime/marco", {}, payload);      
     }
+    
+    function answerTheCall(username, id){
+    	var answerMessage = {'username': username, 'id': id};
+        var payload = JSON.stringify(answerMessage);
+        setTimeout(function(){
+        	subscribeStomp.send("/BuyMyTime/answer", {}, payload);  
+        }, 2000);
+    }
+    
    	</script>
 	<h1>
 		<a th:href="@{/}">Home Page</a>

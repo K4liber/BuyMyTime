@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+import data.AnswerMessage;
 import data.HelloMessage;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,6 +30,13 @@ public class HelloController {
         HelloMessage exampleMessage = new HelloMessage();
         exampleMessage.setName(principal.getName());
         messaging.convertAndSendToUser(message.getName(), "/queue/reply", exampleMessage);
+    }
+    
+    @MessageMapping("/answer")
+    public void answerTheCall(Principal principal, AnswerMessage message) throws InterruptedException{
+        System.out.println("Akceptacja rozmowy z uzytkownikiem: " 
+    + message.getUsername()+ " od: " + principal.getName() + " z ID: " + message.getId());   
+        messaging.convertAndSendToUser(message.getUsername(), "/queue/accept", message);
     }
     
     @SubscribeMapping({"/greetings"})

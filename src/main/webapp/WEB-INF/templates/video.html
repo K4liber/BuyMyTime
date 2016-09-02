@@ -9,22 +9,33 @@
 </head>
 <body>
   <header id="header" class="alt" th:include="header :: headerMenu"></header>
-  <span id="username" type="hidden" th:text="${username}">Nick</span>
-  <span id="yourid" type="hidden" th:text="${yourid}">Your id</span>
+  <span id="yourid" type="hidden" th:text="${yourid}">Nick</span>
+  <span id="id" type="hidden" th:text="${id}">Nick</span>
   <script>
 
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
+    navigator.getUserMedia({audio: true, video: true},
+        function(stream){
+            window.localStream = stream;
+        },
+        function(error) {
+            console.log("navigator.getUserMedia error: ", error);
+        }
+    );
+    
     // PeerJS object
-    var yourId = document.getElementById("yourid").innerText;
-    var peer = new Peer(yourId, {host: 'localhost', port: 9000, path: '/BuyMyTime'});
+    var yourid = document.getElementById("yourid").innerText;
+    var peer = new Peer(yourid, {host: 'localhost', port: 9000, path: '/BuyMyTime'});
 
     peer.on('open', function(){
       $('#my-id').text(peer.id);
-      var username = document.getElementById("username").innerText;
-      console.log("Dzwoniacy: " + username + ". Twoje id: " + peer.id);
-      answerTheCall(username, peer.id);
+      var idToCall = document.getElementById("id").innerText;
+      setTimeout(function(){
+    	  var call = peer.call(idToCall, window.localStream);
+          console.log(window.localStream);
+          step3(call);
+      }, 2000);
     });
 	
     // Receiving a call
