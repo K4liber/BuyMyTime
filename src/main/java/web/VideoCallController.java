@@ -11,13 +11,14 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import data.AnswerMessage;
+import data.ChatMessage;
 import data.HelloMessage;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.*;
 
 @Controller
-public class HelloController {
+public class VideoCallController {
 	
 	@Autowired
 	private SimpMessagingTemplate messaging;
@@ -37,6 +38,13 @@ public class HelloController {
         System.out.println("Akceptacja rozmowy z uzytkownikiem: " 
     + message.getUsername()+ " od: " + principal.getName() + " z ID: " + message.getId());   
         messaging.convertAndSendToUser(message.getUsername(), "/queue/accept", message);
+    }
+    
+    @MessageMapping("/message")
+    public void chatMessage(Principal principal, ChatMessage message) throws InterruptedException{
+    	System.out.println("Message from:" + message.getSendFrom() + " .To: " + message.getSendTo() 
+    			+ ". message:" + message.getMessageContent());
+        messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", message);
     }
     
     @SubscribeMapping({"/greetings"})

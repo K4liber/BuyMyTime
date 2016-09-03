@@ -65,7 +65,7 @@ public class UserController {
 	
 	@RequestMapping(value="/cam/{username}", method=RequestMethod.GET)
     public String getForDay(@PathVariable("username") String username, Model model, Principal principal) {
-		model.addAttribute("username", username);
+		model.addAttribute("id", username);
 		model.addAttribute("yourid", principal.getName());
 		return "cam";
     }

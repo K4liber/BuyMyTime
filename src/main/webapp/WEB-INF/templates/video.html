@@ -9,8 +9,8 @@
 </head>
 <body>
   <header id="header" class="alt" th:include="header :: headerMenu"></header>
-  <span id="yourid" type="hidden" th:text="${yourid}">Nick</span>
-  <span id="id" type="hidden" th:text="${id}">Nick</span>
+  <span id="yourid" style="display:none;" th:text="${yourid}">Nick</span>
+  <span id="id" style="display:none;" th:text="${id}">Nick</span>
   <script>
 
     // Compatibility shim
@@ -26,7 +26,7 @@
     
     // PeerJS object
     var yourid = document.getElementById("yourid").innerText;
-    var peer = new Peer(yourid, {host: 'localhost', port: 9000, path: '/BuyMyTime'});
+    var peer = new Peer(yourid, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
 
     peer.on('open', function(){
       $('#my-id').text(peer.id);
@@ -35,7 +35,7 @@
     	  var call = peer.call(idToCall, window.localStream);
           console.log(window.localStream);
           step3(call);
-      }, 2000);
+      }, 5000);
     });
 	
     // Receiving a call
@@ -63,7 +63,7 @@
         window.existingCall.close();
         step2();
       });
-
+      
       // Retry if getUserMedia fails
       $('#step1-retry').click(function(){
         $('#step1-error').hide();
@@ -86,7 +86,7 @@
     }
 
     function step2 () {
-      $('#step1, #step3').hide();
+      $('#step1').hide();
       $('#step2').show();
     }
 
@@ -128,8 +128,7 @@
 
       <!-- Steps -->
       <div class="pure-u-1-3">
-        <h2>PeerJS Video Chat</h2>
-		
+        <h2>Video Chat with <span id="their-id">...</span></h2>
         <!-- Get local audio/video stream -->
         <div id="step1">
           <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
@@ -139,20 +138,12 @@
           </div>
         </div>
 
-        <!-- Make calls to others -->
-        <div id="step2">
-          <p>Your id: <span id="my-id">...</span></p>
-          <p>Share this id with others so they can call you.</p>
-          <h3>Make a call</h3>
-          <div class="pure-form">
-            <input type="text" placeholder="Call user id..." id="callto-id">
-            <a href="#" class="pure-button pure-button-success" id="make-call">Call</a>
-          </div>
-        </div>
-
         <!-- Call in progress -->
+        <ul id="messagesList">
+        </ul>
+        <textarea rows="2" cols="30" id="messageContent"></textarea>
+        <p><a href="#" class="pure-button" id="send">Send</a></p>
         <div id="step3">
-          <p>Currently in call with <span id="their-id">...</span></p>
           <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
         </div>
       </div>

@@ -6,13 +6,14 @@
     <script th:src="@{/resources/js/peer.js}"></script>
 	<script type="text/javascript">
 	if(subscribeSocketJS === undefined)
-		var subscribeSocketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
+		var subscribeSocketJS = new SockJS('http://192.168.1.19:8080/BuyMyTime/greeting');	
 	if(subscribeStomp === undefined){
 		var subscribeStomp = Stomp.over(subscribeSocketJS);
 		subscribeStomp.connect('guest', 'guest', function(frame){
 	    	console.log("Connected to subsriber.");
 	     	subscribeStomp.subscribe('/user/queue/reply', handleIncoming);
 	     	subscribeStomp.subscribe('/user/queue/accept', handleAccept);
+	     	subscribeStomp.subscribe('/user/queue/chat', handleChatMessage);
 	    });
 	}
 	
@@ -33,6 +34,11 @@
     	window.location.href = '/BuyMyTime/video/' + message.id;
     }
     
+    function handleChatMessage(message){
+    	var message = JSON.parse(message.body);
+    	$("#messagesList").append('<li style="color:green;">' + message.messageContent + '</li>');
+    }
+    
     function call(){
     	var nick = document.getElementById("username").innerText;
 	    var callMessage = {'name': nick};
@@ -48,6 +54,18 @@
         }, 2000);
     }
     
+    $(function(){
+    	$('#send').click(function(){
+      	  var messageContent = $('#messageContent').val()
+      	  var sendFrom = document.getElementById("yourid").innerText;
+      	  var sendTo = document.getElementById("id").innerText;
+      	  $("#messagesList").append('<li>' + messageContent + '</li>');
+      	  $("textarea#messageContent").val("");
+      	  var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
+          var payload = JSON.stringify(chatMessage);
+          subscribeStomp.send("/BuyMyTime/message", {}, payload);
+        });
+    });
    	</script>
 	<h1>
 		<a th:href="@{/}">Home Page</a>
