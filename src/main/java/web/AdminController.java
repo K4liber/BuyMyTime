@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import data.Category;
-import data.User;
+import data.entities.Category;
+import data.entities.User;
 import repositories.CategoryRepository;
 
 @Controller

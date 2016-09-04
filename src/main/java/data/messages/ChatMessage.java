@@ -1,4 +1,4 @@
-package data;
+package data.messages;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

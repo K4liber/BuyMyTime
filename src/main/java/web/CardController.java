@@ -19,11 +19,11 @@ import repositories.CardRepository;
 import repositories.CardTagRepository;
 import repositories.TagToCardRepository;
 import repositories.UserRepository;
-import data.Card;
-import data.CardModel;
-import data.CardTag;
-import data.TagToCard;
-import data.User;
+import data.entities.Card;
+import data.entities.CardModel;
+import data.entities.CardTag;
+import data.entities.TagToCard;
+import data.entities.User;
 
 @Controller
 public class CardController {

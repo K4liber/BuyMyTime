@@ -1,4 +1,4 @@
-package data;
+package data.messages;
 
 public class PaidMessage {
 

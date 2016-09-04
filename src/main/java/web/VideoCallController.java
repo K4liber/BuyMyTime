@@ -12,10 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import data.AnswerCallMessage;
-import data.ChatMessage;
-import data.CallMessage;
-import data.PaidMessage;
+import data.messages.AnswerCallMessage;
+import data.messages.CallMessage;
+import data.messages.ChatMessage;
+import data.messages.PaidMessage;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.*;
@@ -52,6 +52,11 @@ public class VideoCallController {
         System.out.println("Prosba o platna rozmowe: " 
     + message.getFromId()+ ", " + message.getToId() + ", " + message.getPrice() + ", " + message.getMaxTime());   
         messaging.convertAndSendToUser(message.getToId(), "/queue/paid", message);
+    }
+    
+    @MessageMapping("/paidCallAnswer")
+    public void paidCallAnswer(Principal principal, PaidMessage message) throws InterruptedException{  
+        messaging.convertAndSendToUser(message.getToId(), "/queue/paidAnswer", message);
     }
     
     @MessageMapping("/message")

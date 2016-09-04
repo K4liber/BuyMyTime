@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import data.ChatMessage;
-import data.User;
+import data.entities.User;
+import data.messages.ChatMessage;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 

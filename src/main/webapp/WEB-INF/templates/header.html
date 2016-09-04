@@ -2,7 +2,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
     <link rel="stylesheet" th:href="@{/resources/css/style.css}">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
     <script th:src="@{/resources/js/peer.js}"></script>
@@ -19,6 +19,7 @@
 	     	subscribeStomp.subscribe('/user/queue/acceptCall', handleAcceptCall);
 	     	subscribeStomp.subscribe('/user/queue/chat', handleChatMessage);
 	     	subscribeStomp.subscribe('/user/queue/paid', handlePaidMessage);
+	     	subscribeStomp.subscribe('/user/queue/paidAnswer', handlePaidAnswer);
 	    });
 	}
 	
@@ -45,7 +46,18 @@
     }
     
     function handlePaidMessage(message){
-    	console.log("Prosba o platna rozmowe");
+    	var message = JSON.parse(message.body);
+    	$("#price").text(message.price);
+    	$("#maxTime").text(message.maxTime);
+    	$("#dialog").dialog();
+    }
+    
+    function handlePaidAnswer(message){
+    	var message = JSON.parse(message.body);
+    	if(message.accept)
+    		console.log("Akceptacja");
+    	else
+    		console.log("Nie akceptacja");
     }
     
     function call(){
@@ -66,10 +78,17 @@
     function startPaid(toId, fromId, price, maxTime){
     	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime};
         var payload = JSON.stringify(answerMessage);
-        console.log("Tu jest");
         setTimeout(function(){
         	subscribeStomp.send("/BuyMyTime/paidCall", {}, payload);  
         }, 1000);
+    }
+    
+    function sendPaidAnswer(toId, fromId, price, maxTime, accept){
+    	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime, 'accept': accept};
+        var payload = JSON.stringify(answerMessage);
+        setTimeout(function(){
+        	subscribeStomp.send("/BuyMyTime/paidCallAnswer", {}, payload);  
+        }, 500);
     }
     
     $(function(){
