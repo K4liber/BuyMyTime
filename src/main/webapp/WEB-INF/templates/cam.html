@@ -11,6 +11,11 @@
   <header id="header" class="alt" th:include="header :: headerMenu"></header>
   <span id="id" style="display:none;" th:text="${id}">Nick</span>
   <span id="yourid" style="display:none;" th:text="${yourid}">Your id</span>
+  <div id="dialog" title="Start paying conversation" style="display:none;">
+	  <p>Price per hour:<input type="text" id="price"></p>
+	  <p>Max time of conversation:<input type="text" id="maxTime">minutes</p>
+	  <p><a href="#" class="pure-button pure-button-success" id="paid">Send</a></p>
+  </div>
   <script>
 
     // Compatibility shim
@@ -18,11 +23,11 @@
 
     // PeerJS object
     var yourId = document.getElementById("yourid").innerText;
+    var id = document.getElementById("id").innerText;
     var peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
 
     peer.on('open', function(){
       $('#my-id').text(peer.id);
-      var id = document.getElementById("id").innerText;
       console.log("Dzwoniacy: " + id + ". Twoje id: " + peer.id);
       answerTheCall(id, peer.id);
     });
@@ -50,6 +55,17 @@
       $('#step1-retry').click(function(){
         $('#step1-error').hide();
         step1();
+      });
+      
+      $('#start').click(function(){
+    	  $("#dialog").dialog();
+      });
+      
+      $('#paid').click(function(){
+    	  $("#dialog").dialog('close');
+    	  var price = $('#price').val();
+    	  var maxTime = $('#maxTime').val();
+    	  startPaid(id, peer.id, price, maxTime);
       });
 
       // Get things started
@@ -89,48 +105,38 @@
       $('#step1, #step2').hide();
       $('#step3').show();
     }
-
+    
   </script>
-
-
 </head>
-
-
-
 <body>
-
   <div class="pure-g">
-	  
-      <!-- Video area -->
-      <div class="pure-u-2-3" id="video-container">
-        <video id="their-video" autoplay></video>
-        <video id="my-video" muted="true" autoplay></video>
-      </div>
-
-      <!-- Steps -->
-      <div class="pure-u-1-3">
-        <h2>Video Chat with <span id="their-id">...</span></h2>
-        <!-- Get local audio/video stream -->
-        <div id="step1">
-          <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
-          <div id="step1-error">
-            <p>Failed to access the webcam and microphone. Make sure to run this demo on an http server and click allow when asked for permission by the browser.</p>
-            <a href="#" class="pure-button pure-button-error" id="step1-retry">Try again</a>
-          </div>
-        </div>
-
-
-        <!-- Call in progress -->
-        <ul id="messagesList">
-        </ul>
-        <textarea rows="2" cols="30" id="messageContent"></textarea>
-        <p><a href="#" class="pure-button" id="send">Send</a></p>
-        <div id="step3">
-          <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
-        </div>
-      </div>
-  </div>
-
+		<!-- Video area -->
+		<div class="pure-u-2-3" id="video-container">
+		  <video id="their-video" autoplay></video>
+		  <video id="my-video" muted="true" autoplay></video>
+		</div>
+		<!-- Steps -->
+		<div class="pure-u-1-3">
+		  <h2>Video Chat with <span id="their-id">...</span></h2>
+		  <!-- Get local audio/video stream -->
+		  <div id="step1">
+		    <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
+		    <div id="step1-error">
+		      <p>Failed to access the webcam and microphone. Make sure to run this demo on an http server and click allow when asked for permission by the browser.</p>
+		      <a href="#" class="pure-button pure-button-error" id="step1-retry">Try again</a>
+		    </div>
+		  </div>
+		  <!-- Call in progress -->
+		  <ul id="messagesList">
+		  </ul>
+		  <textarea rows="2" cols="30" id="messageContent"> </textarea>
+		  <p><a href="#" class="pure-button" id="send">Send</a></p>
+		  <div id="step3">
+		    <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
+		    <p><a href="#" class="pure-button pure-button-success" id="start">Start</a></p>
+		  </div>
+		</div>
+	</div>
 	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
 </body>
 </html>

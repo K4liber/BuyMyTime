@@ -1,6 +1,6 @@
 package data;
 
-public class HelloMessage {
+public class CallMessage {
 
     private String name;
 

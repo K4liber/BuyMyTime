@@ -21,6 +21,9 @@
 		<a th:href="@{/newcard}">New Card</a> |
 		<a th:href="@{/logout}">Logout</a>
 	</div>
+	<div class="tilesContainer">
+			<div class="tile" th:each="cat,iterationStatus  : ${categories}" th:text="${cat.name}">1</div>
+	</div>
 	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
 </body>
 </html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html
+	xmlns="http//www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Home Page</title>
+</head>
+<body>
+	<header id="header" class="alt" th:include="header :: headerMenu"></header>
+	<form method="POST" enctype="multipart/form-data" th:object="${category}">
+		<table>
+			<tr>
+				<td>
+					<label>Name:</label>:
+					<input type="text" th:field="*{name}" /><br/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Description:</label>:
+					<input type="text" th:field="*{description}" /><br/>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="add" /></td>
+			</tr>
+		</table>
+	</form>
+	<h1>Categories:</h1>
+	<table>
+		<tr>
+			<th>Nr</th>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Description</th>
+		</tr>
+		<tr th:each="cat,iterationStatus  : ${categories}">
+			<td th:text="${iterationStatus.count}">1</td>
+			<td th:text="${cat.id}">001</td>
+			<td th:text="${cat.name}">001</td>
+			<td th:text="${cat.description}">001</td>
+		</tr>
+	</table>
+	
+	<div id="footer" class="alt" th:include="footer :: footerBlock"></div>
+</body>
+</html>

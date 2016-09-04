@@ -1,6 +1,6 @@
 package data;
 
-public class AnswerMessage {
+public class AnswerCallMessage {
 	
 	private String username;
 	private String id;

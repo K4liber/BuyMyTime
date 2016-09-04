@@ -30,10 +30,6 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   background: rgb(66, 184, 221); /* this is a light blue */
 }
 
-
-
-
-
 *, *:before, *:after {
   -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -67,4 +63,17 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   font-weight: bold;
 }
 
+.tile {
+	text-align:center;
+	border: 1px solid rgb(200,200,200);
+	background-color: rgb(140,140,140);
+	width:25%;
+	height:100px;              
+	float: left;
+}
 
+.tilesContainer {
+    overflow: auto;
+    width: 100%;
+    padding: 10%;
+}

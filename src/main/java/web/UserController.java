@@ -20,10 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import data.ChatMessage;
 import data.User;
-import data.UserRepository;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
+
+import repositories.ChatMessageRepository;
+import repositories.UserRepository;
 
 import com.google.gson.Gson;
 
@@ -35,6 +38,9 @@ public class UserController {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	ChatMessageRepository chatMessageRepository;
 	
 	@RequestMapping(value="/register", method=RequestMethod.GET)
 	public String showRegistrationForm( Model model){
@@ -53,14 +59,6 @@ public class UserController {
 			session.invalidate();
 		}
 		return "home";
-	}
-	
-	@RequestMapping(value="/cam", method=RequestMethod.GET)
-	public String camSession(HttpSession session){
-		if(session.getAttribute("user") != null){
-			session.invalidate();
-		}
-		return "cam";
 	}
 	
 	@RequestMapping(value="/cam/{username}", method=RequestMethod.GET)

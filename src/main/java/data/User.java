@@ -33,6 +33,8 @@ public class User{
 	@NotNull
 	private boolean enabled;
 	
+	private Long coins;
+	
 	public Long getId() {
 		return id;
 	}
@@ -79,5 +81,13 @@ public class User{
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public Long getCoins() {
+		return coins;
+	}
+
+	public void setCoins(Long coins) {
+		this.coins = coins;
 	}
 }

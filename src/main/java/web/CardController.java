@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import repositories.CardRepository;
+import repositories.CardTagRepository;
+import repositories.TagToCardRepository;
+import repositories.UserRepository;
 import data.Card;
 import data.CardModel;
-import data.CardRepository;
-import data.CardTagRepository;
 import data.CardTag;
 import data.TagToCard;
-import data.TagToCardRepository;
 import data.User;
-import data.UserRepository;
 
 @Controller
 public class CardController {

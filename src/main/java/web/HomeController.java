@@ -1,21 +1,28 @@
 package web;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import repositories.CategoryRepository;
+import data.Category;
 
 @RequestMapping
 @Controller
 public class HomeController {
 	
-	@RequestMapping(value="/", method=RequestMethod.GET)
-	public String home(){
-		return "home";
-	}
+	@Autowired
+	CategoryRepository categoryRepository;
 	
-	@RequestMapping(value="/hellows", method=RequestMethod.GET)
-	public String hello(){
-		return "hello";
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String home(Model model){
+		List<Category> categories = categoryRepository.findAll();
+		model.addAttribute("categories",categories);
+		return "home";
 	}
 	
 }
