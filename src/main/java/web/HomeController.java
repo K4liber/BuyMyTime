@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import repositories.CategoryRepository;
 import data.entities.Category;
+import data.entities.User;
 
 @RequestMapping
 @Controller
@@ -22,6 +23,7 @@ public class HomeController {
 	public String home(Model model){
 		List<Category> categories = categoryRepository.findAll();
 		model.addAttribute("categories",categories);
+		model.addAttribute("user", new User());
 		return "home";
 	}
 	
