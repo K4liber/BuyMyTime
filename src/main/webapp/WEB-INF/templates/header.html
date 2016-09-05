@@ -54,9 +54,10 @@
     
     function handlePaidAnswer(message){
     	var message = JSON.parse(message.body);
-    	if(message.accept)
+    	if(message.accept){
     		console.log("Akceptacja");
-    	else
+    	    startClock();
+    	}else
     		console.log("Nie akceptacja");
     }
     
@@ -100,6 +101,10 @@
       	  var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
           var payload = JSON.stringify(chatMessage);
           subscribeStomp.send("/BuyMyTime/message", {}, payload);
+        });
+    	
+        $("#loginButton").click(function(){
+        	$("#loginDialog").dialog();
         });
     });
     

@@ -36,7 +36,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	@Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         super.onStartup(servletContext);
-        servletContext.addListener(new SessionListener());
+        //servletContext.addListener(new SessionListener());
     }
 	
 }

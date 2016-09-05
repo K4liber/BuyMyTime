@@ -9,12 +9,31 @@
 </head>
 <body>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
-	<div th:if="${session != null && session.user != null}" >
-		
-	</div>
-	<div>
-		<a th:href="@{/register}">Register</a> |
-		<a th:href="@{/login}">Login</a>
+	<div id="loginDialog" title="Sign up" style="display:none;">
+	  <form name='f' method="POST" th:action="@{/login}">
+		<table>
+			<tr>
+				<td>
+					<label>Username</label>:
+					<input type="text" name="username" /><br/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Password</label>:
+					<input type="password" name='password'/><br/>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="submit" name='submit' value="Login" class="ui-button ui-widget ui-corner-all"/></td>
+			</tr>
+		</table>
+	  </form>
+	  Do not sign up yet?
+	  <button class="ui-button ui-widget ui-corner-all" th:href="@{/register}">Register</button> |
+    </div>
+	<div sec:authorize="isAnonymous()">
+		<button id="loginButton" class="ui-button ui-widget ui-corner-all">Login</button>
 	</div>
 	<div sec:authorize="hasRole('ROLE_USER')">
 	    <a th:href="@{/cards}">Cards</a> |

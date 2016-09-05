@@ -1,6 +1,7 @@
 package web;
 
 import java.security.Principal;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import data.entities.PaidConversation;
 import data.messages.AnswerCallMessage;
+import data.messages.AnswerPaidMessage;
 import data.messages.CallMessage;
 import data.messages.ChatMessage;
 import data.messages.PaidMessage;
@@ -21,6 +24,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.*;
 
 import repositories.ChatMessageRepository;
+import repositories.PaidConversationRepository;
 import repositories.UserRepository;
 
 @Controller
@@ -30,7 +34,10 @@ public class VideoCallController {
 	private SimpMessagingTemplate messaging;
 	
 	@Autowired
-	ChatMessageRepository chatMessageRepository;
+	private ChatMessageRepository chatMessageRepository;
+	
+	@Autowired
+	private PaidConversationRepository paidConversationRepository;
 	
     @MessageMapping("/call")
     public void greeting(Principal principal, CallMessage message) throws InterruptedException{
@@ -55,7 +62,13 @@ public class VideoCallController {
     }
     
     @MessageMapping("/paidCallAnswer")
-    public void paidCallAnswer(Principal principal, PaidMessage message) throws InterruptedException{  
+    public void paidCallAnswer(Principal principal, AnswerPaidMessage message) throws InterruptedException{ 
+    	if(message.isAccept()){
+    		PaidConversation paidConversation = new PaidConversation(message);
+    		paidConversation.setConversationStart((new Date()).toString());
+    		paidConversation.setConversationPoint((new Date()).toString());
+    		paidConversationRepository.save(paidConversation);
+    	}
         messaging.convertAndSendToUser(message.getToId(), "/queue/paidAnswer", message);
     }
     

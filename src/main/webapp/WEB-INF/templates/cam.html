@@ -106,6 +106,34 @@
       $('#step3').show();
     }
     
+    function startClock() {
+    	
+    	var startTime = new Date();
+        var startHours = startTime.getHours();
+        var startMinutes = startTime.getMinutes();
+        var startSeconds = startTime.getSeconds();
+        $(".clock").show();
+        
+	    setInterval(function(){
+	
+	        var currentTime = new Date().getTime() - startTime.getTime();
+	        var timer = new Date();
+	        timer.setTime(currentTime);
+	        var hours = timer.getHours() - 1;
+	        var minutes = timer.getMinutes();
+	        var seconds = timer.getSeconds();
+	
+	        // Add leading zeros
+	        minutes = (minutes < 10 ? "0" : "") + minutes;
+	        seconds = (seconds < 10 ? "0" : "") + seconds;
+	        hours = (hours < 10 ? "0" : "") + hours;
+	
+	        // Compose the string for display
+	        var currentTimeString = hours + ":" + minutes + ":" + seconds;
+	        $(".clock").html(currentTimeString);
+	
+		},1000);
+    }
   </script>
 </head>
 <body>
@@ -118,7 +146,7 @@
 		<!-- Steps -->
 		<div class="pure-u-1-3">
 		  <h2>Video Chat with <span id="their-id">...</span></h2>
-		  <div id="clock" style="display:none;">Clock</div>
+		  <div class="clock" style="display:none;"></div>
 		  <!-- Get local audio/video stream -->
 		  <div id="step1">
 		    <p>Please click `allow` on the top of the screen so we can access your webcam and microphone for calls.</p>
