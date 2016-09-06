@@ -57,9 +57,9 @@ public class UserController {
 	
 	@RequestMapping(value="/about", method=RequestMethod.GET)
 	@ResponseBody
-	public User getAbout(@RequestParam String username, Model model){
-		User user = userRepository.findByUsername(username);
-		return user;
+	public String getAbout(@RequestParam String username, Model model){
+		String about = "COs tam sadasdasd" + username;
+		return about;
 	}
 	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)

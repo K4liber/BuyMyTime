@@ -83,6 +83,33 @@ function sendPaidAnswer(toId, fromId, price, maxTime, accept){
     }, 500);
 }
 
+function getLogin() {
+	$("#loginDialog").dialog();
+}
+
+function getHome() {
+	$.ajax({
+        type : "GET",
+        url : "categories",
+        success: function(data){
+        	homeHtml(data);
+        }
+    });
+}
+
+function getAbout() {
+	$.ajax({
+        type : "GET",
+        url : "about",
+        data : {
+        "username" : "bolek"
+        },
+        success: function(data){
+        	aboutHtml(data);
+        }
+    });
+}
+
 $(function(){
 	$('#send').click(function(){
   	  var messageContent = $('#messageContent').val()
@@ -93,28 +120,12 @@ $(function(){
       var payload = JSON.stringify(chatMessage);
       subscribeStomp.send("/BuyMyTime/message", {}, payload);
     });
-	
-    $("#loginButton").click(function(){
-    	$("#loginDialog").dialog();
-    });
     
     $("#registerButton").click(function(){
     	$("#loginDialog").dialog('close');
     	$("#registerDialog").dialog();
     });
     
-    $("#aboutButton").click(function(){
-        $.ajax({
-            type : "GET",
-            url : "about",
-            data : {
-            "username" : "bolek"
-            },
-            success: function(data){
-            	console.log(data);
-            }
-        });
-    });
 });
 
 $(document).keypress(function(e) {
