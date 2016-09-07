@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import repositories.CardRepository;
@@ -38,10 +39,10 @@ public class CardController {
 	TagToCardRepository tagToCardRepository;
 	
 	@RequestMapping(value="/cards", method=RequestMethod.GET)
-	public String showCards( Model model){
+	@ResponseBody
+	public List<Card> showCards( Model model){
 		List<Card> cards = cardRepository.findAll();
-		model.addAttribute("cards", cards);
-		return "cards";
+		return cards;
 	}
 	
 	@RequestMapping(value="/newcard", method=RequestMethod.GET)

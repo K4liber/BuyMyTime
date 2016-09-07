@@ -97,6 +97,47 @@ function getHome() {
     });
 }
 
+function getCards() {
+	$.ajax({
+        type : "GET",
+        url : "cards",
+        success: function(data){
+        	cardsHtml(data);
+        }
+    });
+}
+
+function getProfile() {
+	$.ajax({
+        type : "GET",
+        url : "username",
+        success: function(data){
+        	getUserProfile(data);
+        }
+    });
+}
+
+function getUserProfile(username){
+	$.ajax({
+        type : "GET",
+        url : "profile/" + username,
+        success: function(data){
+        	profileHtml(data);
+        	console.log(data);
+        }
+    });
+}
+
+function getLogout() {
+	$.ajax({
+        type : "GET",
+        url : "logout",
+        success: function(data){
+        	window.location.replace("");
+        }
+    });
+}
+
 function getAbout() {
 	$.ajax({
         type : "GET",

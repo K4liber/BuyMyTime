@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import data.entities.User;
 import data.messages.ChatMessage;
+import data.views.UserProfile;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -55,13 +56,6 @@ public class UserController {
 		return "loginForm";
 	}
 	
-	@RequestMapping(value="/about", method=RequestMethod.GET)
-	@ResponseBody
-	public String getAbout(@RequestParam String username, Model model){
-		String about = "COs tam sadasdasd" + username;
-		return about;
-	}
-	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logoutRequest(HttpSession session){
 		if(session.getAttribute("user") != null){
@@ -85,7 +79,8 @@ public class UserController {
     }
 	
 	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
-	public String showProfile(@PathVariable("username") String userNick, Model model){
+	@ResponseBody
+	public UserProfile showProfile(@PathVariable("username") String userNick, Model model){
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		List<String> usersNamesList = new ArrayList<String>();
 		for (Object principal: principals) {
@@ -93,10 +88,17 @@ public class UserController {
 		        usersNamesList.add(((UserDetails) principal).getUsername());
 		    }
 		}
+		System.out.println(userNick);
 		User user = userRepository.findByUsername(userNick);
-		model.addAttribute("user", user);
-		model.addAttribute("status", usersNamesList.contains(userNick));
-		return "profile";
+		UserProfile profile = new UserProfile(user);
+		profile.setStatus(usersNamesList.contains(userNick));
+		return profile;
+	}
+	
+	@RequestMapping(value="/username", method=RequestMethod.GET)
+	@ResponseBody
+	public String getUsername(Principal principal, Model model){
+		return principal.getName();
 	}
 	
 	@RequestMapping(value="/register", method=RequestMethod.POST)

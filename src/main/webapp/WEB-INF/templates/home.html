@@ -10,6 +10,9 @@
 <body>
 	<sec:authorize access="hasRole('ROLE_USER')" var="isUser"></sec:authorize>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
+	<script>
+		getHome();
+	</script>
 	<div id="loginDialog" title="Sign in" style="display:none;">
 	  <form name='f' method="POST" th:action="@{/login}">
 		<table>
@@ -72,18 +75,17 @@
 	</div>
 	<div class="tilesContainer" id="container">
 		<div sec:authorize="isAnonymous()">
-		<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
-		<button id="aboutButton" class="ui-button ui-widget ui-corner-all" onclick="getAbout()">About</button>
-		<button id="loginButton" class="ui-button ui-widget ui-corner-all" onClick="getLogin()">Sign in</button>
+			<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
+			<button id="aboutButton" class="ui-button ui-widget ui-corner-all" onclick="getAbout()">About</button>
+			<button id="loginButton" class="ui-button ui-widget ui-corner-all" onClick="getLogin()">Sign in</button>
 		</div>
 		<div sec:authorize="hasRole('ROLE_USER')">
-		    <a th:href="@{/cards}">Cards</a> |
-			<a th:href="@{/newcard}">New Card</a> |
-			<a th:href="@{/logout}">Logout</a>
+			<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
+			<button id="profileButton" class="ui-button ui-widget ui-corner-all" onClick="getProfile()">Profile</button>
+			<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getCards()">Cards</button>
+			<button id="logoutButton" class="ui-button ui-widget ui-corner-all" onClick="getLogout()">Logout</button>
 		</div>
-		<div class="contents" id="contents">
-			<div class="tile" th:each="cat,iterationStatus  : ${categories}" th:text="${cat.name}">1</div>
-		</div>
+		<div class="contents" id="contents"></div>
 	</div>
 </body>
 </html>
