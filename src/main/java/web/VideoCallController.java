@@ -49,9 +49,7 @@ public class VideoCallController {
     
     @MessageMapping("/answerCall")
     public void answerTheCall(Principal principal, AnswerCallMessage message) throws InterruptedException{
-        System.out.println("Akceptacja rozmowy z uzytkownikiem: " 
-    + message.getUsername()+ " od: " + principal.getName() + " z ID: " + message.getId());   
-        messaging.convertAndSendToUser(message.getUsername(), "/queue/acceptCall", message);
+        messaging.convertAndSendToUser(message.getCallingFrom(), "/queue/acceptCall", message);
     }
     
     @MessageMapping("/paidCall")

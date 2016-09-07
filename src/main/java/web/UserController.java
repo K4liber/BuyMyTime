@@ -83,6 +83,7 @@ public class UserController {
 	public UserProfile showProfile(@PathVariable("username") String userNick, Model model){
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		List<String> usersNamesList = new ArrayList<String>();
+		System.out.println(userNick);
 		for (Object principal: principals) {
 		    if (principal instanceof UserDetails) {
 		        usersNamesList.add(((UserDetails) principal).getUsername());

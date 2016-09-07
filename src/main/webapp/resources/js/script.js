@@ -16,19 +16,16 @@ if(subscribeStomp === undefined){
 
 function handleCall(call){
 	var message = JSON.parse(call.body);
-	console.log('Subsribing message: ', message);
-	if(confirm("Calling from " + message.name + "! Would you like to answer?")){
-		console.log("Nawiazuje polaczenie!");
-		window.location.href = '/BuyMyTime/cam/' + message.name;
-	}else{
-		console.log("Nie nawiazuje!");
-	};
+	callDialogHtml(message.name);
 }
 
 function handleAcceptCall(acceptCall){
 	var message = JSON.parse(acceptCall.body);
-	console.log('Accepted connection with id: ', message.id);
-	window.location.href = '/BuyMyTime/video/' + message.id;
+	if(message.accept)
+		window.location.href = '/BuyMyTime/video/' + message.callingTo;
+	else{
+		rejectCallHtml(message.callingTo);
+	}
 }
 
 function handleChatMessage(message){
@@ -52,19 +49,39 @@ function handlePaidAnswer(message){
 		console.log("Nie akceptacja");
 }
 
-function call(){
-	var nick = document.getElementById("username").innerText;
-    var callMessage = {'name': nick};
+function call(username){
+    var callMessage = {'name': username};
     var payload = JSON.stringify(callMessage);
-    subscribeStomp.send("/BuyMyTime/call", {}, payload);      
+    subscribeStomp.send("/BuyMyTime/call", {}, payload);  
+    callingDialogHtml(username);
 }
 
-function answerTheCall(username, id){
-	var answerMessage = {'username': username, 'id': id};
+function answerCall(username, id){
+	var answerMessage = {'callingFrom': username, 'callingTo': id, 'accept': true};
     var payload = JSON.stringify(answerMessage);
     setTimeout(function(){
     	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
     }, 2000);
+}
+
+function getUsername(onSuccess) {
+	$.ajax({
+        type : "GET",
+        url : "username",
+        success: function(data){
+        	onSuccess(data);
+        }
+    });
+}
+
+function rejectCall(rejected){
+	getUsername(function(username) {
+		var answerMessage = {'callingFrom': rejected, 'callingTo': username, 'accept': false};
+	    var payload = JSON.stringify(answerMessage);
+	    setTimeout(function(){
+	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
+	    }, 2000);
+	});
 }
 
 function startPaid(toId, fromId, price, maxTime){
@@ -118,6 +135,7 @@ function getProfile() {
 }
 
 function getUserProfile(username){
+	console.log(username);
 	$.ajax({
         type : "GET",
         url : "profile/" + username,

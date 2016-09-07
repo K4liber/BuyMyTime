@@ -29,7 +29,7 @@
     peer.on('open', function(){
       $('#my-id').text(peer.id);
       console.log("Dzwoniacy: " + id + ". Twoje id: " + peer.id);
-      answerTheCall(id, peer.id);
+      answerCall(id, peer.id);
     });
 	
     // Receiving a call
