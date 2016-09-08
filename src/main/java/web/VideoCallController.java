@@ -40,11 +40,18 @@ public class VideoCallController {
 	private PaidConversationRepository paidConversationRepository;
 	
     @MessageMapping("/call")
-    public void greeting(Principal principal, CallMessage message) throws InterruptedException{
+    public void call(Principal principal, CallMessage message) throws InterruptedException{
         System.out.println("Dzwoni do: " + message.getName() + " od: " + principal.getName());   
         CallMessage callMessage = new CallMessage();
         callMessage.setName(principal.getName());
         messaging.convertAndSendToUser(message.getName(), "/queue/call", callMessage);
+    }
+    
+    @MessageMapping("/cancelCall")
+    public void cancelCall(Principal principal, CallMessage message) throws InterruptedException{
+        CallMessage callMessage = new CallMessage();
+        callMessage.setName(principal.getName());
+        messaging.convertAndSendToUser(message.getName(), "/queue/cancelCall", callMessage);
     }
     
     @MessageMapping("/answerCall")

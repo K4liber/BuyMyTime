@@ -71,6 +71,13 @@ public class UserController {
 		return "cam";
     }
 	
+	@RequestMapping(value="/stream/{username}", method=RequestMethod.GET)
+    public String startStream(@PathVariable("username") String username, Model model, Principal principal) {
+		model.addAttribute("id", username);
+		model.addAttribute("yourid", principal.getName());
+		return "stream";
+    }
+	
 	@RequestMapping(value="/video/{id}", method=RequestMethod.GET)
     public String calling(@PathVariable("id") String id, Model model, Principal principal) {
 		model.addAttribute("id", id);

@@ -1,5 +1,6 @@
 package web;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,12 @@ public class HomeController {
 	CategoryRepository categoryRepository;
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
-	public String home(Model model){
+	public String home(Principal principal, Model model){
 		List<Category> categories = categoryRepository.findAll();
 		model.addAttribute("categories",categories);
 		model.addAttribute("user", new User());
+		if(principal != null)
+			model.addAttribute("username", principal.getName());
 		return "home";
 	}
 	

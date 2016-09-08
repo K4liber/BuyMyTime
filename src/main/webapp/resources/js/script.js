@@ -14,12 +14,32 @@ if(subscribeStomp === undefined){
     });
 }
 
+var peer;
+
 function handleCall(call){
+	console.log("handleCall script.js");
 	var message = JSON.parse(call.body);
 	callDialogHtml(message.name);
+	subscribeStomp.subscribe('/user/queue/cancelCall', handleCancleCall);
+}
+
+function handleCancleCall(call){
+	console.log("handleCancleCall script.js");
+	$(document).ready(function() {
+		$("#dialog").dialog({close: function(){ }}).dialog("close");
+	});
+}
+
+function cancelCall(callTo){
+	console.log("cancelCall script.js");
+	$("#callingToDialog").dialog("close");
+	var cancelMessage = {'name': callTo};
+    var payload = JSON.stringify(cancelMessage);
+    subscribeStomp.send("/BuyMyTime/cancelCall", {}, payload); 
 }
 
 function handleAcceptCall(acceptCall){
+	console.log("handleAcceptCall script.js");
 	var message = JSON.parse(acceptCall.body);
 	if(message.accept)
 		window.location.href = '/BuyMyTime/video/' + message.callingTo;
@@ -29,11 +49,13 @@ function handleAcceptCall(acceptCall){
 }
 
 function handleChatMessage(message){
+	console.log("handleChatMessage script.js");
 	var message = JSON.parse(message.body);
 	$("#messagesList").append('<li style="color:green;">' + message.messageContent + '</li>');
 }
 
 function handlePaidMessage(message){
+	console.log("handlePaidMessage script.js");
 	var message = JSON.parse(message.body);
 	$("#price").text(message.price);
 	$("#maxTime").text(message.maxTime);
@@ -41,6 +63,7 @@ function handlePaidMessage(message){
 }
 
 function handlePaidAnswer(message){
+	console.log("handlePaidAnswer script.js");
 	var message = JSON.parse(message.body);
 	if(message.accept){
 		console.log("Akceptacja");
@@ -50,21 +73,39 @@ function handlePaidAnswer(message){
 }
 
 function call(username){
+	console.log("call script.js");
     var callMessage = {'name': username};
     var payload = JSON.stringify(callMessage);
     subscribeStomp.send("/BuyMyTime/call", {}, payload);  
     callingDialogHtml(username);
 }
 
-function answerCall(username, id){
-	var answerMessage = {'callingFrom': username, 'callingTo': id, 'accept': true};
-    var payload = JSON.stringify(answerMessage);
-    setTimeout(function(){
-    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
-    }, 2000);
+function answerCall(callingFrom){
+	console.log("answerCall script.js");
+	var yourId = document.getElementById("userNick").innerText;
+	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
+	peer.on('open', function(){
+      $('#my-id').text(peer.id);
+    });
+    peer.on('call', function(call){
+      call.answer(window.localStream);
+      step3(call);
+    });
+    peer.on('error', function(err){
+      alert(err.message);
+      step2();
+    });
+	getUsername(function(callingTo) {
+		var answerMessage = {'callingFrom': callingFrom, 'callingTo': callingTo, 'accept': true};
+	    var payload = JSON.stringify(answerMessage);
+	    setTimeout(function(){
+	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
+	    }, 100);
+	});
 }
 
 function getUsername(onSuccess) {
+	console.log("getUsername script.js");
 	$.ajax({
         type : "GET",
         url : "username",
@@ -74,7 +115,16 @@ function getUsername(onSuccess) {
     });
 }
 
+function rejectCallClick() {
+	$("#dialog").dialog("close"); 
+}
+
+function cancelCallClick() {
+	$("#dialog").dialog("close");
+}
+
 function rejectCall(rejected){
+	console.log("rejectCall script.js");
 	getUsername(function(username) {
 		var answerMessage = {'callingFrom': rejected, 'callingTo': username, 'accept': false};
 	    var payload = JSON.stringify(answerMessage);
@@ -85,6 +135,7 @@ function rejectCall(rejected){
 }
 
 function startPaid(toId, fromId, price, maxTime){
+	console.log("startPaid script.js");
 	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime};
     var payload = JSON.stringify(answerMessage);
     setTimeout(function(){
@@ -93,6 +144,7 @@ function startPaid(toId, fromId, price, maxTime){
 }
 
 function sendPaidAnswer(toId, fromId, price, maxTime, accept){
+	console.log("sendPaidAnswer script.js");
 	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime, 'accept': accept};
     var payload = JSON.stringify(answerMessage);
     setTimeout(function(){
@@ -135,13 +187,11 @@ function getProfile() {
 }
 
 function getUserProfile(username){
-	console.log(username);
 	$.ajax({
         type : "GET",
         url : "profile/" + username,
         success: function(data){
         	profileHtml(data);
-        	console.log(data);
         }
     });
 }
@@ -167,6 +217,17 @@ function getAbout() {
         	aboutHtml(data);
         }
     });
+}
+
+function sendMessage(){
+	var sendTo = document.getElementById("chatWith").innerText;
+	var messageContent = $('#messageContent').val();
+	var sendFrom = document.getElementById("userNick").innerText;
+	$("#messagesList").append('<li>' + messageContent + '</li>');
+	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
+    var payload = JSON.stringify(chatMessage);
+    subscribeStomp.send("/BuyMyTime/message", {}, payload);
+	
 }
 
 $(function(){
@@ -195,3 +256,67 @@ $(document).keypress(function(e) {
     	$("textarea#messageContent").focus();
     }
 });
+
+function step1 () {
+    // Get audio/video stream
+    navigator.getUserMedia({audio: true, video: true}, function(stream){
+      // Set your video displays
+      $('#my-video').prop('src', URL.createObjectURL(stream));
+      window.localStream = stream;
+      step2();
+    }, function(){ $('#step1-error').show(); });
+}
+
+function step2 () {
+	$('#step1').hide();
+	$('#step2').show();
+}
+
+function step3 (call) {
+    // Hang up on an existing call if present
+    if (window.existingCall) {
+      window.existingCall.close();
+    }
+
+    // Wait for stream on the call, then set peer video display
+    call.on('stream', function(stream){
+      $('#their-video').prop('src', URL.createObjectURL(stream));
+    });
+
+    // UI stuff
+    window.existingCall = call;
+    $('#their-id').text(call.peer);
+    call.on('close', step2);
+    $('#step1, #step2').hide();
+    $('#step3').show();
+}
+
+function startClock() {
+  	
+	var startTime = new Date();
+    var startHours = startTime.getHours();
+	var startMinutes = startTime.getMinutes();
+	var startSeconds = startTime.getSeconds();
+	$(".clock").show();
+      
+    setInterval(function(){
+	
+		var currentTime = new Date().getTime() - startTime.getTime();
+		var timer = new Date();
+		timer.setTime(currentTime);
+		var hours = timer.getHours() - 1;
+		var minutes = timer.getMinutes();
+		var seconds = timer.getSeconds();
+		
+		// Add leading zeros
+		minutes = (minutes < 10 ? "0" : "") + minutes;
+		seconds = (seconds < 10 ? "0" : "") + seconds;
+		hours = (hours < 10 ? "0" : "") + hours;
+		
+		// Compose the string for display
+		var currentTimeString = hours + ":" + minutes + ":" + seconds;
+		$(".clock").html(currentTimeString);
+		
+    },1000);
+    
+}
