@@ -81,12 +81,25 @@ function call(username){
 }
 
 function answerCall(callingFrom){
+	if(peer != undefined){
+		peer.destroy();
+		$("#callOverlap").remove();
+	}
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    navigator.getUserMedia({audio: true, video: true},
+        function(stream){
+            window.localStream = stream;
+        },
+        function(error) {
+            console.log("navigator.getUserMedia error: ", error);
+        }
+    );
 	console.log("answerCall script.js");
 	var yourId = document.getElementById("userNick").innerText;
 	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
 	peer.on('open', function(){
       $('#my-id').text(peer.id);
+      step1();
     });
     peer.on('call', function(call){
       call.answer(window.localStream);
@@ -101,11 +114,15 @@ function answerCall(callingFrom){
 	    var payload = JSON.stringify(answerMessage);
 	    setTimeout(function(){
 	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
-	    }, 200);
+	    }, 2000);
 	});
 }
 
 function peerCall(callingTo) {
+	if(peer != undefined){
+		peer.destroy();
+		$("#callOverlap").remove();
+	}
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     navigator.getUserMedia({audio: true, video: true},
         function(stream){
@@ -126,7 +143,7 @@ function peerCall(callingTo) {
           console.log(window.localStream);
           step3(peer.call(callingTo, window.localStream));
           step1();
-      }, 200);
+      }, 2000);
     });
     peer.on('call', function(call){
       call.answer(window.localStream);
@@ -226,6 +243,27 @@ function getUserProfile(username){
         url : "profile/" + username,
         success: function(data){
         	profileHtml(data);
+        }
+    });
+}
+
+function getContacts(){
+	$.ajax({
+        type : "GET",
+        url : "contacts",
+        success: function(data){
+        	contactsHtml(data);
+        }
+    });
+}
+
+function addContact(contactUsername){
+	$.ajax({
+        type : "GET",
+        url : "addContact/" + contactUsername,
+        success: function(data){
+        	if(data == "success")
+        		successContactAddHtml(contactUsername);
         }
     });
 }
@@ -353,4 +391,9 @@ function startClock() {
 		
     },1000);
     
+}
+
+function showChat(){
+	$("#chatContents").show();
+	$("#contents").hide();
 }

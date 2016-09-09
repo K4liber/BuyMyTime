@@ -8,12 +8,22 @@ function homeHtml(categories) {
 	$("#contents").show();
 }
 
+function contactsHtml(contacts) {
+	var h = [''];
+	contacts.forEach(function(contact){
+		h.push('<div>' + contact.contactUsername + '<\/div>');
+	});
+	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
+}
+
 function cardsHtml(cards) {
 	var h = [''];
 	cards.forEach(function(card){
+		h.push('<div><a><h2>' + card.title + '<\/h2><\/a>');
 		h.push('<button onClick="getUserProfile(\'' + card.userNick + '\')">' + card.userNick + '<\/button>');
-		h.push('<a><h2>' + card.title + '<\/h2><\/a>');
-		h.push('<a>' + card.description + '<\/a>');
+		h.push('<a>' + card.description + '<\/a><\/div>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
@@ -33,14 +43,22 @@ function profileHtml(user) {
 	h.push('<div><span id="username">' + user.username + '</span><\/div>');
 	if(user.status){
 		h.push('<div>Online<\/div>');
-		h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
+		if(user.username != document.getElementById('userNick').innerHTML){
+			h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
+			h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
+		}
 	}else{
 		h.push('<div>Offline<\/div>');
 	}
 	document.getElementById('contents').innerHTML = h.join('');
-	$("#call").click(function(){
-		call(user.username);
-    });
+	if(user.username != document.getElementById('userNick').innerHTML){
+		$("#call").click(function(){
+			call(user.username);
+	    });
+		$("#addContact").click(function(){
+			addContact(user.username);
+	    });
+	}
 	$("#chatContents").hide();
 	$("#contents").show();
 }
@@ -53,6 +71,17 @@ function callingDialogHtml(callTo) {
 	document.getElementById('dialog').innerHTML = h.join('');
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "Outcoming call", closeOnEscape: true, close: function(){ cancelCall(callTo); }});
+		$("#dialog").dialog("open");
+	});
+}
+
+function successContactAddHtml(contactUsername){
+	console.log("successContactAddHtml views.js");
+	var h = [''];
+	h.push('<p>User ' + contactUsername + ' added to Contacts.<\/p>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Adding successful", closeOnEscape: true });
 		$("#dialog").dialog("open");
 	});
 }
@@ -78,7 +107,7 @@ function chatContentHtml(username) {
 	var h = [''];
 	h.push('<div class="left-panel"><video id="their-video" autoplay><\/video><\/div>');
 	h.push('<div class="right-panel">');
-	h.push('<video id="my-video" muted="true" autoplay><\/video>');
+	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
 	h.push('<h2>Video Chat with <span id="chatWith">' + username + '</span><\/h2>');
 	h.push('<div class="clock" style="display:none;"><\/div><div class="chatContent">');
 	h.push('<ul id="messagesList"><\/ul><\/div>');
@@ -90,13 +119,9 @@ function chatContentHtml(username) {
 	h.push('<\/div><\/div>');
 	document.getElementById('chatContents').innerHTML = h.join('');
 	$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
-			' style="float:right;">' + username + '</button>');
+			' style="float:right;" onClick="showChat()">' + username + '</button>');
 	$("#chatContents").show();
 	$("#contents").hide();
-	$("#callOverlap").click(function(){
-		$("#chatContents").show();
-		$("#contents").hide();
-	});
 }
 
 function rejectCallHtml(username) {

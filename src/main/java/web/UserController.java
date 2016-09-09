@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import data.entities.Contact;
 import data.entities.User;
 import data.messages.ChatMessage;
 import data.views.UserProfile;
@@ -31,6 +32,7 @@ import data.views.UserProfile;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import repositories.ChatMessageRepository;
+import repositories.ContactRepository;
 import repositories.UserRepository;
 
 import com.google.gson.Gson;
@@ -43,6 +45,9 @@ public class UserController {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	ContactRepository contactRepository;
 	
 	@Autowired
 	ChatMessageRepository chatMessageRepository;
@@ -107,6 +112,33 @@ public class UserController {
 	@ResponseBody
 	public String getUsername(Principal principal, Model model){
 		return principal.getName();
+	}
+	
+	@RequestMapping(value="/contacts", method=RequestMethod.GET)
+	@ResponseBody
+	public List<Contact> getContacts(Principal principal, Model model){
+		String username = principal.getName();
+		List<Contact> list = contactRepository.findAllByUsername(username);
+		return list;
+	}
+	
+	@RequestMapping(value="/addContact/{contactUsername}", method=RequestMethod.GET)
+	@ResponseBody
+	public String addContact(Principal principal,
+			@PathVariable("contactUsername") String contactUsername, Model model){
+		String username = principal.getName();
+		Contact exist = contactRepository.findByUsernameAndContactUsername(username, contactUsername);
+		if(exist != null)
+			return "exist";
+	    Contact newContact = new Contact();
+	    newContact.setUsername(username);
+	    newContact.setContactUsername(contactUsername);
+		contactRepository.save(newContact);
+		Contact saved = contactRepository.findByUsernameAndContactUsername(username, contactUsername);
+		if(saved != null)
+			return "success";
+		else
+			return "error";
 	}
 	
 	@RequestMapping(value="/register", method=RequestMethod.POST)
