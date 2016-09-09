@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -90,13 +92,11 @@ public class UserController {
 	public UserProfile showProfile(@PathVariable("username") String userNick, Model model){
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		List<String> usersNamesList = new ArrayList<String>();
-		System.out.println(userNick);
 		for (Object principal: principals) {
 		    if (principal instanceof UserDetails) {
 		        usersNamesList.add(((UserDetails) principal).getUsername());
 		    }
 		}
-		System.out.println(userNick);
 		User user = userRepository.findByUsername(userNick);
 		UserProfile profile = new UserProfile(user);
 		profile.setStatus(usersNamesList.contains(userNick));

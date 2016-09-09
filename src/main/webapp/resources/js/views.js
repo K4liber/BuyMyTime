@@ -4,6 +4,8 @@ function homeHtml(categories) {
 		h.push('<div class="tile">' + category.name + '<\/div>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
 }
 
 function cardsHtml(cards) {
@@ -14,12 +16,16 @@ function cardsHtml(cards) {
 		h.push('<a>' + card.description + '<\/a>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
 }
 
 function aboutHtml(about) {
 	var h = [''];
 	h.push('<div>' + about + '<\/div>');
 	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
 }
 
 function profileHtml(user) {
@@ -35,6 +41,8 @@ function profileHtml(user) {
 	$("#call").click(function(){
 		call(user.username);
     });
+	$("#chatContents").hide();
+	$("#contents").show();
 }
 
 function callingDialogHtml(callTo) {
@@ -59,13 +67,6 @@ function callDialogHtml(userCalling){
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "Incoming call", closeOnEscape: true, close: function(){ rejectCall(userCalling); }}).dialog("open");
 		$("#answerCall").click(function(){
-			$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
-					' style="float:right;">' + userCalling + '</button>');
-			$("#callOverlap").click(function(){
-				chatContentHtml(userCalling);
-				peer.destroy();
-				answerCall(userCalling);
-			});
 			$("#dialog").dialog({close: function(){ }}).dialog("close");
 			chatContentHtml(userCalling);
 			answerCall(userCalling);
@@ -74,7 +75,6 @@ function callDialogHtml(userCalling){
 }
 
 function chatContentHtml(username) {
-	$("#contents").css("height", "620px");
 	var h = [''];
 	h.push('<div class="left-panel"><video id="their-video" autoplay><\/video><\/div>');
 	h.push('<div class="right-panel">');
@@ -88,7 +88,15 @@ function chatContentHtml(username) {
 	h.push('<p><button class="pure-button pure-button-error" id="end-call">End call<\/button><\/p>');
 	h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
 	h.push('<\/div><\/div>');
-	document.getElementById('contents').innerHTML = h.join('');
+	document.getElementById('chatContents').innerHTML = h.join('');
+	$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
+			' style="float:right;">' + username + '</button>');
+	$("#chatContents").show();
+	$("#contents").hide();
+	$("#callOverlap").click(function(){
+		$("#chatContents").show();
+		$("#contents").hide();
+	});
 }
 
 function rejectCallHtml(username) {

@@ -42,7 +42,7 @@ function handleAcceptCall(acceptCall){
 	console.log("handleAcceptCall script.js");
 	var message = JSON.parse(acceptCall.body);
 	if(message.accept)
-		window.location.href = '/BuyMyTime/video/' + message.callingTo;
+		peerCall(message.callingTo);
 	else{
 		rejectCallHtml(message.callingTo);
 	}
@@ -81,6 +81,7 @@ function call(username){
 }
 
 function answerCall(callingFrom){
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 	console.log("answerCall script.js");
 	var yourId = document.getElementById("userNick").innerText;
 	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
@@ -100,8 +101,41 @@ function answerCall(callingFrom){
 	    var payload = JSON.stringify(answerMessage);
 	    setTimeout(function(){
 	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
-	    }, 100);
+	    }, 200);
 	});
+}
+
+function peerCall(callingTo) {
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    navigator.getUserMedia({audio: true, video: true},
+        function(stream){
+            window.localStream = stream;
+        },
+        function(error) {
+            console.log("navigator.getUserMedia error: ", error);
+        }
+    );
+	$("#dialog").dialog({close: function(){ }}).dialog("close");
+	chatContentHtml(callingTo);
+	console.log("peerCall script.js");
+	var yourId = document.getElementById("userNick").innerText;
+	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
+    peer.on('open', function(){
+      $('#my-id').text(peer.id);
+      setTimeout(function(){
+          console.log(window.localStream);
+          step3(peer.call(callingTo, window.localStream));
+          step1();
+      }, 200);
+    });
+    peer.on('call', function(call){
+      call.answer(window.localStream);
+      step3(call);
+    });
+    peer.on('error', function(err){
+      alert(err.message);
+      step2();
+    });
 }
 
 function getUsername(onSuccess) {
