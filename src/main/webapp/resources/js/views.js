@@ -1,21 +1,56 @@
 function homeHtml(categories) {
 	var h = [''];
 	categories.forEach(function(category){
-		h.push('<div class="tile">' + category.name + '<\/div>');
+		h.push('<div class="tile">');
+		h.push('<div>' + category.name + '<\/div>');
+		h.push('<div>' + category.description + '<\/div>');
+		h.push('</div>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
 }
 
-function contactsHtml(contacts) {
+function contactsHtml(userProfiles) {
 	var h = [''];
-	contacts.forEach(function(contact){
-		h.push('<div>' + contact.contactUsername + '<\/div>');
+	h.push('<div class="contactsPanel">');
+	h.push('<div class="contactsLeftPanel">');
+	userProfiles.forEach(function(userProfile){
+		h.push('<div class="contactPanel">');
+		h.push('<div id="contactUsername">'+ userProfile.username + '<\/div>');
+		if(userProfile.status)
+			h.push(' Online');
+		h.push('<\/div>');
 	});
+	h.push('<\/div>');
+	h.push('<div class="contactsRightPanel" id="contactsRightPanel"><\/div>');
+	h.push('<\/div>');
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
+	$(document).ready(function() {
+		$("#contactUsername").click(function(){
+			getContact(this.innerHTML);
+	    });
+	});
+}
+
+function contactHtml(userContact) {
+	var h = [''];
+	h.push('<div><h2><span id="contactUsername">' + userContact.profile.username +'<\/span><\/h2><\/div>');
+	h.push('<div class="messagesContent">');
+	h.push('<div id="messagesList">');
+	userContact.userMessages.forEach(function(userMessage){
+		if(userMessage.mine)
+			h.push('<div>' + userMessage.message + '<\/div>');
+		else
+			h.push('<div style="color:green;">' + userMessage.message + '<\/div>');
+	});
+	h.push('<\/div>');
+	h.push('<\/div>');
+	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
+	h.push('<p><button class="pure-button" id="send" onClick="sendMessage()">Send<\/button><\/p>');
+	document.getElementById('contactsRightPanel').innerHTML = h.join('');
 }
 
 function cardsHtml(cards) {
@@ -110,13 +145,14 @@ function chatContentHtml(username) {
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
 	h.push('<h2>Video Chat with <span id="chatWith">' + username + '</span><\/h2>');
 	h.push('<div class="clock" style="display:none;"><\/div><div class="chatContent">');
-	h.push('<ul id="messagesList"><\/ul><\/div>');
-	h.push('<textarea rows="2" cols="30" id="messageContent"> <\/textarea>');
-	h.push('<p><button class="pure-button" id="send" onClick="sendMessage()">Send<\/button><\/p>');
-	h.push('<div id="step3">');
-	h.push('<p><button class="pure-button pure-button-error" id="end-call">End call<\/button><\/p>');
-	h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
-	h.push('<\/div><\/div>');
+	h.push('<div id="chatMessagesList"><\/div><\/div>');
+	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
+	h.push('<p><button class="pure-button" id="send" onClick="sendChatMessage()">Send<\/button><\/p>');
+	//h.push('<div id="step3">');
+	//h.push('<p><button class="pure-button pure-button-error" id="end-call">End call<\/button><\/p>');
+	//h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
+	//h.push('<\/div>');
+	h.push('<\/div>');
 	document.getElementById('chatContents').innerHTML = h.join('');
 	$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
 			' style="float:right;" onClick="showChat()">' + username + '</button>');

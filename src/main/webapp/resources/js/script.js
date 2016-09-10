@@ -51,7 +51,8 @@ function handleAcceptCall(acceptCall){
 function handleChatMessage(message){
 	console.log("handleChatMessage script.js");
 	var message = JSON.parse(message.body);
-	$("#messagesList").append('<li style="color:green;">' + message.messageContent + '</li>');
+	$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
+	$("#chatMessagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
 }
 
 function handlePaidMessage(message){
@@ -268,6 +269,16 @@ function addContact(contactUsername){
     });
 }
 
+function getContact(contactUsername){
+	$.ajax({
+        type : "GET",
+        url : "contact/" + contactUsername,
+        success: function(data){
+        	contactHtml(data);
+        }
+    });
+}
+
 function getLogout() {
 	$.ajax({
         type : "GET",
@@ -291,15 +302,26 @@ function getAbout() {
     });
 }
 
-function sendMessage(){
+function sendChatMessage(){
 	var sendTo = document.getElementById("chatWith").innerText;
 	var messageContent = $('#messageContent').val();
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList").append('<li>' + messageContent + '</li>');
+	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
-    subscribeStomp.send("/BuyMyTime/message", {}, payload);
-	
+    subscribeStomp.send("/BuyMyTime/message", {}, payload);	
+}
+
+function sendMessage(){
+	var sendTo = document.getElementById("contactUsername").innerText;
+	var messageContent = $('#messageContent').val();
+	var sendFrom = document.getElementById("userNick").innerText;
+	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
+    var payload = JSON.stringify(chatMessage);
+    subscribeStomp.send("/BuyMyTime/message", {}, payload);	
 }
 
 $(function(){

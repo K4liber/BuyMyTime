@@ -53,13 +53,17 @@
 .tile {
 	text-align:center;
 	border: 1px solid rgb(200,200,200);
-	background-color: rgb(140,140,140);
+	background-color: rgba(0,140,0,0.5);
 	width:25%;
 	height: 33%;              
 	float: left;
 }
 
-.tilesContainer {
+body {
+	background-color:rgba(0,200,0,0.1);
+}
+
+.container {
     overflow: auto;
     width: 100%;
     height: 550px;
@@ -100,4 +104,32 @@
 .chatContent {
 	overflow:auto;
 	height: 40px;
+}
+
+.contactsPanel{
+	width:100%;
+	overflow:auto;
+}
+
+.contactsLeftPanel {
+	float:left;
+	width:30%;
+}
+
+.contactsRightPanel{
+	float:left;
+	width:60%;
+	margin:5%;
+}
+
+.contactPanel{
+	width:90%;
+	background-color: rgb(100,255,250);
+	margin:5%;
+	height:40px;
+}
+
+.messagesContent{
+	overflow:auto;
+	height: 100px;
 }

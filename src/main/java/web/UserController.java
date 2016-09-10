@@ -3,6 +3,9 @@ package web;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +30,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import data.entities.Contact;
 import data.entities.User;
 import data.messages.ChatMessage;
+import data.views.UserContact;
+import data.views.UserMessage;
 import data.views.UserProfile;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -65,6 +70,7 @@ public class UserController {
 	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logoutRequest(HttpSession session){
+		sessionRegistry.removeSessionInformation(session.getId());
 		if(session.getAttribute("user") != null){
 			session.invalidate();
 		}
@@ -95,19 +101,47 @@ public class UserController {
 	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
 	@ResponseBody
 	public UserProfile showProfile(@PathVariable("username") String userNick, Model model){
-		List<Object> principals = sessionRegistry.getAllPrincipals();
-		List<String> usersNamesList = new ArrayList<String>();
-		for (Object principal: principals) {
-		    if (principal instanceof UserDetails) {
-		        usersNamesList.add(((UserDetails) principal).getUsername());
-		    }
-		}
 		User user = userRepository.findByUsername(userNick);
 		UserProfile profile = new UserProfile(user);
-		profile.setStatus(usersNamesList.contains(userNick));
+		profile.setStatus(isOnline(userNick));
 		return profile;
 	}
 	
+	@RequestMapping(value="/contact/{contactUsername}", method=RequestMethod.GET)
+	@ResponseBody
+	public UserContact showContact(Principal principal, @PathVariable("contactUsername") String contactUsername, Model model){
+		String username = principal.getName();
+		User contactUser = userRepository.findByUsername(contactUsername);
+		UserProfile userProfile = new UserProfile(contactUser);
+		userProfile.setStatus(isOnline(contactUsername));
+		List<ChatMessage> chatMessagesSended = chatMessageRepository.findAllBySendFromAndSendTo(username, contactUsername);
+		List<ChatMessage> chatMessagesReceived = chatMessageRepository.findAllBySendFromAndSendTo(contactUsername, username);
+		List<UserMessage> userMessages = groupingMessages(chatMessagesSended, chatMessagesReceived, username);
+		UserContact userContact = new UserContact(userProfile, userMessages);
+		return userContact;
+	}
+	
+	private List<UserMessage> groupingMessages(
+			List<ChatMessage> chatMessagesSended,
+			List<ChatMessage> chatMessagesReceived, String username) {
+		List<ChatMessage> chatMessages = new ArrayList<ChatMessage>(chatMessagesSended);
+		chatMessages.addAll(chatMessagesReceived);
+		Collections.sort(chatMessages, new Comparator<ChatMessage>() {
+		    @Override
+		    public int compare(ChatMessage o1, ChatMessage o2) {
+		        return o1.getDateTime().compareTo(o2.getDateTime());
+		    }
+		});
+		List<UserMessage> userMessages = new ArrayList<UserMessage>();
+		for(Iterator<ChatMessage> i = chatMessages.iterator(); i.hasNext(); ) {
+		    ChatMessage chatMessage = i.next();
+		    UserMessage userMessage = new UserMessage(chatMessage, username);
+		    userMessages.add(userMessage);
+		    System.out.println(userMessage.getMessage());
+		}
+		return userMessages;
+	}
+
 	@RequestMapping(value="/username", method=RequestMethod.GET)
 	@ResponseBody
 	public String getUsername(Principal principal, Model model){
@@ -116,10 +150,19 @@ public class UserController {
 	
 	@RequestMapping(value="/contacts", method=RequestMethod.GET)
 	@ResponseBody
-	public List<Contact> getContacts(Principal principal, Model model){
+	public List<UserProfile> getContacts(Principal principal, Model model){
 		String username = principal.getName();
-		List<Contact> list = contactRepository.findAllByUsername(username);
-		return list;
+		List<UserProfile> userProfileList = new ArrayList<UserProfile>();
+		List<Contact> contactList = contactRepository.findAllByUsername(username);
+		for(Iterator<Contact> i = contactList.iterator(); i.hasNext(); ) {
+		    Contact item = i.next();
+		    String contactUsername = item.getContactUsername();
+		    User user = userRepository.findByUsername(contactUsername);
+		    UserProfile profile = new UserProfile(user);
+		    profile.setStatus(isOnline(contactUsername));
+		    userProfileList.add(profile);
+		}	
+		return userProfileList;
 	}
 	
 	@RequestMapping(value="/addContact/{contactUsername}", method=RequestMethod.GET)
@@ -160,6 +203,17 @@ public class UserController {
 		userRepository.save(user);
 		model.addFlashAttribute(user);		
 		return "registerSucceed";
+	}
+	
+	private boolean isOnline(String username){
+		List<Object> principals = sessionRegistry.getAllPrincipals();
+		List<String> usersNamesList = new ArrayList<String>();
+		for (Object principal: principals) {
+		    if (principal instanceof UserDetails) {
+		        usersNamesList.add(((UserDetails) principal).getUsername());
+		    }
+		}
+		return usersNamesList.contains(username);
 	}
 	
 }

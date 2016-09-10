@@ -7,7 +7,6 @@ import javax.persistence.Id;
 
 import data.entities.User;
 
-
 @Entity
 public class UserProfile{
 	

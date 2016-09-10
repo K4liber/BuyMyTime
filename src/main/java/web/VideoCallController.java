@@ -82,6 +82,7 @@ public class VideoCallController {
     	System.out.println("Message from:" + message.getSendFrom() + " .To: " + message.getSendTo() 
     			+ ". message:" + message.getMessageContent());
         messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", message);
+        message.setDateTime(new Date().toString());
         chatMessageRepository.save(message);
     }
     
