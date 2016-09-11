@@ -52,15 +52,15 @@
 
 .tile {
 	text-align:center;
-	border: 1px solid rgb(200,200,200);
-	background-color: rgba(0,140,0,0.5);
+	border: 1px solid rgb(240,240,240);
+	background-color: rgba(160,160,160,0.5);
 	width:25%;
 	height: 33%;              
 	float: left;
 }
 
 body {
-	background-color:rgba(0,200,0,0.1);
+	background-color:rgba(240,240,240,0.2);
 }
 
 .container {
@@ -124,7 +124,7 @@ body {
 
 .contactPanel{
 	width:90%;
-	background-color: rgb(100,255,250);
+	background-color: rgb(230,230,230);
 	margin:5%;
 	height:40px;
 }

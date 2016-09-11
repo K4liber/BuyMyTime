@@ -29,6 +29,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import data.entities.Contact;
 import data.entities.User;
+import data.entities.UserRole;
 import data.messages.ChatMessage;
 import data.views.UserContact;
 import data.views.UserMessage;
@@ -38,7 +39,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import repositories.ChatMessageRepository;
 import repositories.ContactRepository;
+import repositories.UserProfileRepository;
 import repositories.UserRepository;
+import repositories.UserRoleRepository;
 
 import com.google.gson.Gson;
 
@@ -52,6 +55,12 @@ public class UserController {
 	UserRepository userRepository;
 	
 	@Autowired
+	UserRoleRepository userRoleRepository;
+	
+	@Autowired
+	UserProfileRepository userProfileRepository;
+	
+	@Autowired
 	ContactRepository contactRepository;
 	
 	@Autowired
@@ -60,12 +69,20 @@ public class UserController {
 	@RequestMapping(value="/register", method=RequestMethod.GET)
 	public String showRegistrationForm( Model model){
 		model.addAttribute("user", new User());
-		return "registerForm";
+		return "register";
+	}
+	
+	@RequestMapping(value="/edit", method=RequestMethod.GET)
+	public String showEditForm( Model model, Principal principal){
+		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
+		model.addAttribute("username", principal.getName());
+		model.addAttribute("userProfile", userProfile);
+		return "edit";
 	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String showLoginForm( Model model){
-		return "loginForm";
+		return "login";
 	}
 	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
@@ -105,6 +122,17 @@ public class UserController {
 		UserProfile profile = new UserProfile(user);
 		profile.setStatus(isOnline(userNick));
 		return profile;
+	}
+	
+	@RequestMapping(value="/user/{username}", method=RequestMethod.GET)
+	@ResponseBody
+	public User getUser(@PathVariable("username") String username, Principal principal, Model model){
+		if(principal.getName().equals(username)){
+		User user = userRepository.findByUsername(username);
+		return user;
+		}else{
+			return null;
+		}
 	}
 	
 	@RequestMapping(value="/contact/{contactUsername}", method=RequestMethod.GET)
@@ -198,11 +226,16 @@ public class UserController {
 			bindingResult.rejectValue("email", "error.user", "this email already in use");
 
 		if(bindingResult.hasErrors())
-			return "registerForm";
+			return "register";
 		
+		user.setEnabled(true);
 		userRepository.save(user);
+		UserProfile userProfile = new UserProfile(user);
+		userProfileRepository.save(userProfile);
+		UserRole userRole = new UserRole(user.getUsername(),"ROLE_USER");
+		userRoleRepository.save(userRole);
 		model.addFlashAttribute(user);		
-		return "registerSucceed";
+		return "login";
 	}
 	
 	private boolean isOnline(String username){

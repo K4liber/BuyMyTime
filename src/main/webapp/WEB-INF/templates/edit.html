@@ -5,20 +5,21 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
 <meta charset="UTF-8">
-<title>Home Page</title>
+<title>Edit profile</title>
 </head>
 <body>
-	<sec:authorize access="hasRole('ROLE_USER')" var="isUser"></sec:authorize>
 	<span id="userNick" th:text="${username}" style="display:none;">username</span>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
-	<script>
-		getHome();
-	</script>
 	<div class="container" id="container">
 		<div th:include="menu :: menuBlock"></div>
-		<div class="contents" id="contents"></div>
-		<div class="chatContents" id="chatContents" style="display:none;"></div>
-		<div id="dialog" style="display:none;"></div>
+		<div class="contents" id="contents">
+			<form method="POST" enctype="multipart/form-data" th:object="${userProfile}">
+				<div>Username: <span id="username" th:text="*{username}"></span></div>
+				<div>Email: <span id="email" th:text="*{email}"></span></div>
+				<div>Profile photo: <input type="file" name="file" /></div>
+				<input type="submit" value="Edit" />
+			</form>
+		</div>
 	</div>
 </body>
 </html>

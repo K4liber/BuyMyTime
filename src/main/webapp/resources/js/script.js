@@ -205,7 +205,13 @@ function sendPaidAnswer(toId, fromId, price, maxTime, accept){
 }
 
 function getLogin() {
-	$("#loginDialog").dialog();
+	$.ajax({
+        type : "GET",
+        url : "login",
+        success: function(data){
+        	homeHtml(data);
+        }
+    });
 }
 
 function getHome() {
@@ -269,6 +275,10 @@ function addContact(contactUsername){
     });
 }
 
+function editProfile(userProfile){
+	window.location.href = "edit";
+}
+
 function getContact(contactUsername){
 	$.ajax({
         type : "GET",
@@ -284,7 +294,6 @@ function getLogout() {
         type : "GET",
         url : "logout",
         success: function(data){
-        	window.location.replace("");
         }
     });
 }

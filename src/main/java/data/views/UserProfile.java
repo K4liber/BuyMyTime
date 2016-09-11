@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import data.entities.Rate;
 import data.entities.User;
 
 @Entity
@@ -17,6 +18,11 @@ public class UserProfile{
 	private String username;
 	private String email;
 	private Boolean status;
+	private Long quantity;
+	private Long price;
+	private Long efficiency;
+	
+	public UserProfile(){};
 	
 	public UserProfile(User user){
 		this.username = user.getUsername();
@@ -42,6 +48,30 @@ public class UserProfile{
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public Long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Long quantity) {
+		this.quantity = quantity;
+	}
+
+	public Long getPrice() {
+		return price;
+	}
+
+	public void setPrice(Long price) {
+		this.price = price;
+	}
+
+	public Long getEfficiency() {
+		return efficiency;
+	}
+
+	public void setEfficiency(Long efficiency) {
+		this.efficiency = efficiency;
 	}
 	
 }

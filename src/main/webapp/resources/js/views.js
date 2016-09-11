@@ -73,25 +73,31 @@ function aboutHtml(about) {
 	$("#contents").show();
 }
 
-function profileHtml(user) {
+function profileHtml(userProfile) {
 	var h = [''];
-	h.push('<div><span id="username">' + user.username + '</span><\/div>');
-	if(user.status){
+	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
+	if(userProfile.status){
 		h.push('<div>Online<\/div>');
-		if(user.username != document.getElementById('userNick').innerHTML){
+		if(userProfile.username != document.getElementById('userNick').innerHTML){
 			h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
 			h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
+		}else{
+			h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
 		}
 	}else{
 		h.push('<div>Offline<\/div>');
 	}
 	document.getElementById('contents').innerHTML = h.join('');
-	if(user.username != document.getElementById('userNick').innerHTML){
+	if(userProfile.username != document.getElementById('userNick').innerHTML){
 		$("#call").click(function(){
-			call(user.username);
+			call(userProfile.username);
 	    });
 		$("#addContact").click(function(){
-			addContact(user.username);
+			addContact(userProfile.username);
+	    });
+	}else{
+		$("#edit").click(function(){
+			editProfile(userProfile);
 	    });
 	}
 	$("#chatContents").hide();

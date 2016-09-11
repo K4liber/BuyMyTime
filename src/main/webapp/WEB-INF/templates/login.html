@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html
+	xmlns="http//www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+</head>
+<body onload='document.f.username.focus();'>
+	<header id="header" class="alt" th:include="header :: headerMenu"></header>
+	<div class="container" id="container">
+		<div th:include="menu :: menuBlock"></div>
+		<div class="contents" id="contents">
+		<p th:if="${error}">Wrong user or password</p>
+			<form name='f' method="POST" th:action="@{/login}">
+				<table>
+					<tr>
+						<td>
+							<label>Username</label>:
+							<input type="text" name="username" /><br/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label>Password</label>:
+							<input type="password" name='password'/><br/>
+						</td>
+					</tr>
+					<tr>
+						<td><input type="submit" name='submit' value="Login" class="ui-button ui-widget ui-corner-all"/></td>
+					</tr>
+				</table>
+			  </form>
+		  	Do not sign up yet?
+			<a th:href="@{/register}"><button id="loginButton" class="ui-button ui-widget ui-corner-all">Sign up</button></a>
+		</div>
+   	</div>
+</body>
+</html>
