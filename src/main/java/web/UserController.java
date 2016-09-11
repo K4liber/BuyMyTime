@@ -1,5 +1,6 @@
 package web;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import data.entities.Contact;
@@ -42,8 +44,6 @@ import repositories.ContactRepository;
 import repositories.UserProfileRepository;
 import repositories.UserRepository;
 import repositories.UserRoleRepository;
-
-import com.google.gson.Gson;
 
 @Controller
 public class UserController {
@@ -78,6 +78,26 @@ public class UserController {
 		model.addAttribute("username", principal.getName());
 		model.addAttribute("userProfile", userProfile);
 		return "edit";
+	}
+	
+	@RequestMapping(value="/edit", method=RequestMethod.POST)
+	public String handleFileUpload(@RequestParam("file") MultipartFile file,
+        Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
+		System.out.println(file.getOriginalFilename());
+		String realPathtoUploads = request.getSession().getServletContext().getRealPath("/resources/img");
+		System.out.println(realPathtoUploads);
+        if(! new File(realPathtoUploads).exists())
+        {
+            new File(realPathtoUploads).mkdir();
+        }
+        String fileName = principal.getName() + "." + file.getContentType().split("/")[1];
+        String filePath = realPathtoUploads + "\\" + fileName;
+        File dest = new File(filePath);
+        file.transferTo(dest);
+        UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
+        userProfile.setImageName(fileName);
+        userProfileRepository.save(userProfile);
+		return "home";
 	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.GET)
@@ -118,10 +138,9 @@ public class UserController {
 	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
 	@ResponseBody
 	public UserProfile showProfile(@PathVariable("username") String userNick, Model model){
-		User user = userRepository.findByUsername(userNick);
-		UserProfile profile = new UserProfile(user);
-		profile.setStatus(isOnline(userNick));
-		return profile;
+		UserProfile userProfile = userProfileRepository.findByUsername(userNick);
+		userProfile.setStatus(isOnline(userNick));
+		return userProfile;
 	}
 	
 	@RequestMapping(value="/user/{username}", method=RequestMethod.GET)

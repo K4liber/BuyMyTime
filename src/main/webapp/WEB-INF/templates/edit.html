@@ -17,6 +17,7 @@
 				<div>Username: <span id="username" th:text="*{username}"></span></div>
 				<div>Email: <span id="email" th:text="*{email}"></span></div>
 				<div>Profile photo: <input type="file" name="file" /></div>
+				<div><img class="profileImage" th:src="@{/resources/img/} + *{imageName}"/></div>
 				<input type="submit" value="Edit" />
 			</form>
 		</div>

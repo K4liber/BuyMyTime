@@ -133,3 +133,7 @@ body {
 	overflow:auto;
 	height: 100px;
 }
+
+.profileImage{
+	max-height: 100px;
+}

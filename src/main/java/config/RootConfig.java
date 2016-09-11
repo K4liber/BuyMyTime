@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages={"repositories"})
-@ComponentScan(basePackages={"data"},
+@ComponentScan(basePackages={"data","services"},
 	excludeFilters={
 		@Filter(type=FilterType.ANNOTATION, value = EnableWebMvc.class)
 })

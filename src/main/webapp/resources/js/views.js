@@ -74,8 +74,10 @@ function aboutHtml(about) {
 }
 
 function profileHtml(userProfile) {
+	console.log(userProfile);
 	var h = [''];
 	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
+	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/><\/div>');
 	if(userProfile.status){
 		h.push('<div>Online<\/div>');
 		if(userProfile.username != document.getElementById('userNick').innerHTML){

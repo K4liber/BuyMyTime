@@ -21,6 +21,7 @@ public class UserProfile{
 	private Long quantity;
 	private Long price;
 	private Long efficiency;
+	private String imageName;
 	
 	public UserProfile(){};
 	
@@ -72,6 +73,14 @@ public class UserProfile{
 
 	public void setEfficiency(Long efficiency) {
 		this.efficiency = efficiency;
+	}
+
+	public String getImageName() {
+		return imageName;
+	}
+
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 	
 }
