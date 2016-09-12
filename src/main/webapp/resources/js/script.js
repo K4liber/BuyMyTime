@@ -7,7 +7,8 @@ if(subscribeStomp === undefined){
 	subscribeStomp.connect('guest', 'guest', function(frame){
     	console.log("Connected to subsriber.");
      	subscribeStomp.subscribe('/user/queue/call', handleCall);
-     	subscribeStomp.subscribe('/user/queue/acceptCall', handleAcceptCall);
+     	subscribeStomp.subscribe('/user/queue/callAnswer', handleCallAnswer);
+     	subscribeStomp.subscribe('/user/queue/callEnd', handleCallEnd);
      	subscribeStomp.subscribe('/user/queue/chat', handleChatMessage);
      	subscribeStomp.subscribe('/user/queue/paid', handlePaidMessage);
      	subscribeStomp.subscribe('/user/queue/paidAnswer', handlePaidAnswer);
@@ -15,6 +16,10 @@ if(subscribeStomp === undefined){
 }
 
 var peer;
+
+function handleCallEnd(message){
+	
+}
 
 function handleCall(call){
 	console.log("handleCall script.js");
@@ -30,6 +35,13 @@ function handleCancleCall(call){
 	});
 }
 
+function handleCallEnd(call){
+	console.log("handleCallEnd script.js");
+	var message = JSON.parse(call.body);
+	callEndDialogHtml(message.name);
+	endCall(message.name);
+}
+
 function cancelCall(callTo){
 	console.log("cancelCall script.js");
 	$("#callingToDialog").dialog("close");
@@ -38,9 +50,9 @@ function cancelCall(callTo){
     subscribeStomp.send("/BuyMyTime/cancelCall", {}, payload); 
 }
 
-function handleAcceptCall(acceptCall){
-	console.log("handleAcceptCall script.js");
-	var message = JSON.parse(acceptCall.body);
+function handleCallAnswer(callAnswer){
+	console.log("handleCallAnswer script.js");
+	var message = JSON.parse(callAnswer.body);
 	if(message.accept)
 		peerCall(message.callingTo);
 	else{
@@ -114,7 +126,7 @@ function answerCall(callingFrom){
 		var answerMessage = {'callingFrom': callingFrom, 'callingTo': callingTo, 'accept': true};
 	    var payload = JSON.stringify(answerMessage);
 	    setTimeout(function(){
-	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
+	    	subscribeStomp.send("/BuyMyTime/callAnswer", {}, payload);  
 	    }, 2000);
 	});
 }
@@ -269,8 +281,11 @@ function addContact(contactUsername){
         type : "GET",
         url : "addContact/" + contactUsername,
         success: function(data){
-        	if(data == "success")
-        		successContactAddHtml(contactUsername);
+        	if(data == "success"){
+        		successContactDialogAddHtml(contactUsername);
+        	}else if(data == "exist"){
+        		existContactDialogHtml(contactUsername);
+        	}
         }
     });
 }
@@ -427,4 +442,18 @@ function startClock() {
 function showChat(){
 	$("#chatContents").show();
 	$("#contents").hide();
+}
+
+function endCall(callWith) {
+	$("#callOverlap").remove();
+	getHome();
+	peer.destroy();
+	window.localStream.getVideoTracks()[0].stop();
+}
+
+function sendEndCallMessage(callWith){
+	var callEndMessage = {'name': callWith};
+    var payload = JSON.stringify(callEndMessage);
+    console.log(payload);
+    subscribeStomp.send("/BuyMyTime/callEnd", {}, payload); 
 }

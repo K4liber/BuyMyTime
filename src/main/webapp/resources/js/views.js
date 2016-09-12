@@ -17,9 +17,12 @@ function contactsHtml(userProfiles) {
 	h.push('<div class="contactsLeftPanel">');
 	userProfiles.forEach(function(userProfile){
 		h.push('<div class="contactPanel">');
-		h.push('<div id="contactUsername">'+ userProfile.username + '<\/div>');
+		h.push('<ul style="list-style-type:none">');
 		if(userProfile.status)
-			h.push(' Online');
+			h.push('<div id="contactUsername"><li style="color:green;">'+ userProfile.username + '<\/li><\/div>');
+		else
+			h.push('<div id="contactUsername"><li>'+ userProfile.username + '<\/li><\/div>');
+		h.push('<\/ul>');
 		h.push('<\/div>');
 	});
 	h.push('<\/div>');
@@ -28,8 +31,9 @@ function contactsHtml(userProfiles) {
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
+
 	$(document).ready(function() {
-		$("#contactUsername").click(function(){
+		$("li").click(function(){
 			getContact(this.innerHTML);
 	    });
 	});
@@ -78,30 +82,34 @@ function profileHtml(userProfile) {
 	var h = [''];
 	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
 	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/><\/div>');
+	console.log(document.getElementById('userNick').innerHTML);
+	console.log("A username: " + userProfile.username);
 	if(userProfile.status){
 		h.push('<div>Online<\/div>');
-		if(userProfile.username != document.getElementById('userNick').innerHTML){
-			h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
-			h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
-		}else{
-			h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
-		}
 	}else{
 		h.push('<div>Offline<\/div>');
 	}
-	document.getElementById('contents').innerHTML = h.join('');
 	if(userProfile.username != document.getElementById('userNick').innerHTML){
-		$("#call").click(function(){
-			call(userProfile.username);
-	    });
-		$("#addContact").click(function(){
-			addContact(userProfile.username);
-	    });
+		h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
+		h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
 	}else{
-		$("#edit").click(function(){
-			editProfile(userProfile);
-	    });
+		h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
 	}
+	document.getElementById('contents').innerHTML = h.join('');
+	$(document).ready(function() {
+		if(userProfile.username != document.getElementById('userNick').innerHTML){
+			$("#call").click(function(){
+				call(userProfile.username);
+		    });
+			$("#addContact").click(function(){
+				addContact(userProfile.username);
+		    });
+		}else{
+			$("#edit").click(function(){
+				editProfile(userProfile);
+		    });
+		}
+	});
 	$("#chatContents").hide();
 	$("#contents").show();
 }
@@ -118,13 +126,23 @@ function callingDialogHtml(callTo) {
 	});
 }
 
-function successContactAddHtml(contactUsername){
+function successContactDialogAddHtml(contactUsername){
 	console.log("successContactAddHtml views.js");
 	var h = [''];
 	h.push('<p>User ' + contactUsername + ' added to Contacts.<\/p>');
 	document.getElementById('dialog').innerHTML = h.join('');
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "Adding successful", closeOnEscape: true });
+		$("#dialog").dialog("open");
+	});
+}
+
+function existContactDialogHtml(contactUsername){
+	var h = [''];
+	h.push('<p>User ' + contactUsername + ' is your contact actually.<\/p>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Contact already exist", closeOnEscape: true });
 		$("#dialog").dialog("open");
 	});
 }
@@ -151,13 +169,13 @@ function chatContentHtml(username) {
 	h.push('<div class="left-panel"><video id="their-video" autoplay><\/video><\/div>');
 	h.push('<div class="right-panel">');
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
-	h.push('<h2>Video Chat with <span id="chatWith">' + username + '</span><\/h2>');
+	h.push('<h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
 	h.push('<div class="clock" style="display:none;"><\/div><div class="chatContent">');
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="send" onClick="sendChatMessage()">Send<\/button><\/p>');
 	//h.push('<div id="step3">');
-	//h.push('<p><button class="pure-button pure-button-error" id="end-call">End call<\/button><\/p>');
+	h.push('<p><button class="pure-button pure-button-error" id="endCall">End call<\/button><\/p>');
 	//h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
 	//h.push('<\/div>');
 	h.push('<\/div>');
@@ -166,6 +184,40 @@ function chatContentHtml(username) {
 			' style="float:right;" onClick="showChat()">' + username + '</button>');
 	$("#chatContents").show();
 	$("#contents").hide();
+	$(document).ready(function() {
+		$("#endCall").click(function() {
+			confirmEndCallDialogHtml(document.getElementById('chatWith').innerHTML);
+		});
+	});
+}
+
+function confirmEndCallDialogHtml(callWith) {
+	var h = [''];
+	h.push('<p>Are you sure to end conversation with ' + callWith + '?<\/p>');
+	h.push('<div><button id="confirmEndCall" class="pure-button pure-button-success">End Call<\/button>');
+	h.push('<button id="cancelEnding"' 
+			+ 'class="pure-button pure-button-error">Cancel<\/button><\/div>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Confirm the end of conversation", closeOnEscape: true}).dialog("open");
+		$("#confirmEndCall").click(function(){
+			$("#dialog").dialog("close");
+			sendEndCallMessage(callWith);
+			endCall(callWith);
+	    });
+		$("#cancelEnding").click(function(){
+			$("#dialog").dialog("close");
+	    });
+	});
+}
+
+function callEndDialogHtml(callWith) {
+	var h = [''];
+	h.push('<p>User ' + callWith + ' ended conversation with you.<\/p>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "End of conversation", closeOnEscape: true}).dialog("open");
+	});
 }
 
 function rejectCallHtml(username) {

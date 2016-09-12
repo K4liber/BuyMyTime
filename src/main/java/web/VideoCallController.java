@@ -54,9 +54,16 @@ public class VideoCallController {
         messaging.convertAndSendToUser(message.getName(), "/queue/cancelCall", callMessage);
     }
     
-    @MessageMapping("/answerCall")
+    @MessageMapping("/callEnd")
+    public void callEnd(Principal principal, CallMessage message) throws InterruptedException{
+        CallMessage callMessage = new CallMessage();
+        callMessage.setName(principal.getName());
+        messaging.convertAndSendToUser(message.getName(), "/queue/callEnd", callMessage);
+    }
+    
+    @MessageMapping("/callAnswer")
     public void answerTheCall(Principal principal, AnswerCallMessage message) throws InterruptedException{
-        messaging.convertAndSendToUser(message.getCallingFrom(), "/queue/acceptCall", message);
+        messaging.convertAndSendToUser(message.getCallingFrom(), "/queue/callAnswer", message);
     }
     
     @MessageMapping("/paidCall")
