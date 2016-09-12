@@ -12,4 +12,5 @@ import data.entities.Card;
 @Transactional
 public interface CardRepository extends JpaRepository<Card, Long>{
 	List<Card> findAll();
+	List<Card> findAllByCategoryName(String name);
 }

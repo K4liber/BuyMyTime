@@ -201,9 +201,18 @@ public class UserController {
 		String username = principal.getName();
 		List<UserProfile> userProfileList = new ArrayList<UserProfile>();
 		List<Contact> contactList = contactRepository.findAllByUsername(username);
+		List<Contact> contactList2 = contactRepository.findAllByContactUsername(username);
 		for(Iterator<Contact> i = contactList.iterator(); i.hasNext(); ) {
 		    Contact item = i.next();
 		    String contactUsername = item.getContactUsername();
+		    User user = userRepository.findByUsername(contactUsername);
+		    UserProfile profile = new UserProfile(user);
+		    profile.setStatus(isOnline(contactUsername));
+		    userProfileList.add(profile);
+		}	
+		for(Iterator<Contact> i = contactList2.iterator(); i.hasNext(); ) {
+		    Contact item = i.next();
+		    String contactUsername = item.getUsername();
 		    User user = userRepository.findByUsername(contactUsername);
 		    UserProfile profile = new UserProfile(user);
 		    profile.setStatus(isOnline(contactUsername));
@@ -218,7 +227,9 @@ public class UserController {
 			@PathVariable("contactUsername") String contactUsername, Model model){
 		String username = principal.getName();
 		Contact exist = contactRepository.findByUsernameAndContactUsername(username, contactUsername);
-		if(exist != null)
+		Contact exist2 = contactRepository.findByUsernameAndContactUsername(contactUsername, username);
+		boolean contactExist = (exist != null) || (exist2 != null);
+		if(contactExist)
 			return "exist";
 	    Contact newContact = new Contact();
 	    newContact.setUsername(username);

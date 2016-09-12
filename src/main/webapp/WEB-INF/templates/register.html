@@ -10,7 +10,7 @@
 <body>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	<div class="container" id="container">
-		<div th:include="menu :: menuBlock"></div>
+		<div class="menu" th:include="menu :: menuBlock"></div>
 		<div class="contents" id="contents">
 			<form method="POST" enctype="multipart/form-data" th:object="${user}">
 				<table>

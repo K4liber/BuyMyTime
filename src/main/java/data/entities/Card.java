@@ -26,6 +26,11 @@ public class Card {
 	@Size(min=5, max=512)
 	private String description;
 	
+	@NotNull
+	private String categoryName;
+	
+	private String authorImageName;
+	
 	public Long getId() {
 		return id;
 	}
@@ -64,6 +69,22 @@ public class Card {
 
 	public void setUserNick(String userNick) {
 		this.userNick = userNick;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+
+	public String getAuthorImageName() {
+		return authorImageName;
+	}
+
+	public void setAuthorImageName(String authorImageName) {
+		this.authorImageName = authorImageName;
 	}
 	
 	

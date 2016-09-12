@@ -11,7 +11,7 @@
 	<span id="userNick" th:text="${username}" style="display:none;">username</span>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	<div class="container" id="container">
-		<div th:include="menu :: menuBlock"></div>
+		<div class="menu" th:include="menu :: menuBlock"></div>
 		<div class="contents" id="contents">
 			<form method="POST" enctype="multipart/form-data" th:object="${userProfile}">
 				<div>Username: <span id="username" th:text="*{username}"></span></div>
@@ -21,6 +21,7 @@
 				<input type="submit" value="Edit" />
 			</form>
 		</div>
+		<div class="chatContents" id="chatContents" style="display:none;"></div>
 	</div>
 </body>
 </html>

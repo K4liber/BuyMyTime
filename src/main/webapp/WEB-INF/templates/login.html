@@ -10,7 +10,7 @@
 <body onload='document.f.username.focus();'>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	<div class="container" id="container">
-		<div th:include="menu :: menuBlock"></div>
+		<div class="menu" th:include="menu :: menuBlock"></div>
 		<div class="contents" id="contents">
 		<p th:if="${error}">Wrong user or password</p>
 			<form name='f' method="POST" th:action="@{/login}">

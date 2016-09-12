@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.formLogin().loginPage("/login").usernameParameter("username").passwordParameter("password").and()
 			.authorizeRequests()
 			.antMatchers(HttpMethod.POST, "/newcard").authenticated()
+			.antMatchers(HttpMethod.GET, "/newcard").authenticated()
 			.anyRequest().permitAll().and().formLogin();
 		http.csrf().disable();
 		http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());

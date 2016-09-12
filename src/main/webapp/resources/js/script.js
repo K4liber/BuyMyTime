@@ -246,6 +246,16 @@ function getCards() {
     });
 }
 
+function getCardsByCategory(categoryName) {
+	$.ajax({
+        type : "GET",
+        url : "cards/" + categoryName,
+        success: function(data){
+        	cardsHtml(data);
+        }
+    });
+}
+
 function getProfile() {
 	$.ajax({
         type : "GET",
@@ -326,19 +336,17 @@ function getAbout() {
     });
 }
 
-function sendChatMessage(){
-	var sendTo = document.getElementById("chatWith").innerText;
-	var messageContent = $('#messageContent').val();
+function sendChatMessage(sendTo, messageContent){
+	console.log(sendTo);
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
-	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("-1000");
+	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("-1000");
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
     subscribeStomp.send("/BuyMyTime/message", {}, payload);	
 }
 
-function sendMessage(){
-	var sendTo = document.getElementById("contactUsername").innerText;
+function sendMessage(sendTo){
 	var messageContent = $('#messageContent').val();
 	var sendFrom = document.getElementById("userNick").innerText;
 	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
@@ -369,9 +377,9 @@ $(function(){
 $(document).keypress(function(e) {
     if(e.which == 13) {
     	e.preventDefault();
-    	$("#send").click();
-    	$("textarea#messageContent").val("");
-    	$("textarea#messageContent").focus();
+    	$("#chatSendButton").click();
+    	$("textarea#chatMessageContent").val("");
+    	$("textarea#chatMessageContent").focus();
     }
 });
 
@@ -456,4 +464,8 @@ function sendEndCallMessage(callWith){
     var payload = JSON.stringify(callEndMessage);
     console.log(payload);
     subscribeStomp.send("/BuyMyTime/callEnd", {}, payload); 
+}
+
+function getAddCard(){
+	window.location.href = "newcard";
 }

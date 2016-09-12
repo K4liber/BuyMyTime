@@ -1,14 +1,21 @@
 function homeHtml(categories) {
 	var h = [''];
 	categories.forEach(function(category){
-		h.push('<div class="tile">');
+		h.push('<div class="tile"><button id="category' + category.id + '" class="tileButton">');
 		h.push('<div>' + category.name + '<\/div>');
 		h.push('<div>' + category.description + '<\/div>');
-		h.push('</div>');
+		h.push('</button></div>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
+	$(document).ready(function() {
+		categories.forEach(function(category){
+			$("#category" + category.id).click(function(){
+				getCardsByCategory(category.name);
+		    });
+		});
+	});
 }
 
 function contactsHtml(userProfiles) {
@@ -31,7 +38,6 @@ function contactsHtml(userProfiles) {
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
-
 	$(document).ready(function() {
 		$("li").click(function(){
 			getContact(this.innerHTML);
@@ -53,20 +59,35 @@ function contactHtml(userContact) {
 	h.push('<\/div>');
 	h.push('<\/div>');
 	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
-	h.push('<p><button class="pure-button" id="send" onClick="sendMessage()">Send<\/button><\/p>');
+	h.push('<p><button class="pure-button" id="contactSendButton">Send<\/button><\/p>');
 	document.getElementById('contactsRightPanel').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#contactSendButton").click(function(){
+			sendMessage(userContact.profile.username);
+			$("textarea#messageContent").val("");
+	    	$("textarea#messageContent").focus();
+	    });
+	});
 }
 
 function cardsHtml(cards) {
 	var h = [''];
 	cards.forEach(function(card){
-		h.push('<div><a><h2>' + card.title + '<\/h2><\/a>');
+		h.push('<div id="card' + card.id + '"><a><h2>' + card.title + '<\/h2><\/a>');
+		h.push('<img class="profileImage" src="/BuyMyTime/resources/img/' + card.authorImageName + '"/>');
 		h.push('<button onClick="getUserProfile(\'' + card.userNick + '\')">' + card.userNick + '<\/button>');
 		h.push('<a>' + card.description + '<\/a><\/div>');
 	});
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
+	$(document).ready(function() {
+		cards.forEach(function(card){
+			$("#card" + card.id).click(function(){
+				console.log(card.userNick);
+		    });
+		});
+	});
 }
 
 function aboutHtml(about) {
@@ -94,6 +115,7 @@ function profileHtml(userProfile) {
 		h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
 	}else{
 		h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
+		h.push('<button id="addCard" class="pure-button">Add card<\/button>');
 	}
 	document.getElementById('contents').innerHTML = h.join('');
 	$(document).ready(function() {
@@ -107,6 +129,9 @@ function profileHtml(userProfile) {
 		}else{
 			$("#edit").click(function(){
 				editProfile(userProfile);
+		    });
+			$("#addCard").click(function(){
+				getAddCard();
 		    });
 		}
 	});
@@ -172,8 +197,8 @@ function chatContentHtml(username) {
 	h.push('<h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
 	h.push('<div class="clock" style="display:none;"><\/div><div class="chatContent">');
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
-	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
-	h.push('<p><button class="pure-button" id="send" onClick="sendChatMessage()">Send<\/button><\/p>');
+	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
+	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button><\/p>');
 	//h.push('<div id="step3">');
 	h.push('<p><button class="pure-button pure-button-error" id="endCall">End call<\/button><\/p>');
 	//h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
@@ -187,6 +212,10 @@ function chatContentHtml(username) {
 	$(document).ready(function() {
 		$("#endCall").click(function() {
 			confirmEndCallDialogHtml(document.getElementById('chatWith').innerHTML);
+		});
+		$("#chatSendButton").click(function() {
+			sendChatMessage(document.getElementById('chatWith').innerHTML,
+					$('#chatMessageContent').val());
 		});
 	});
 }

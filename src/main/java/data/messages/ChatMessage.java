@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class ChatMessage {
@@ -15,6 +16,9 @@ public class ChatMessage {
 	private String sendTo;
 	private String messageContent;
 	private String dateTime;
+	
+	@NotNull
+	private boolean open;
 	
 	public String getSendTo() {
 		return sendTo;
@@ -55,4 +59,13 @@ public class ChatMessage {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	public boolean isOpen() {
+		return open;
+	}
+
+	public void setOpen(boolean open) {
+		this.open = open;
+	}
+
 }

@@ -8,14 +8,14 @@
 <title>Home Page</title>
 </head>
 <body>
-	<sec:authorize access="hasRole('ROLE_USER')" var="isUser"></sec:authorize>
+	<sec:authorize access="hasRole('ROLE_USER') && isAuthenticated()" var="isUser"></sec:authorize>
 	<span id="userNick" th:text="${username}" style="display:none;">username</span>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	<script>
 		getHome();
 	</script>
 	<div class="container" id="container">
-		<div th:include="menu :: menuBlock"></div>
+		<div class="menu" th:include="menu :: menuBlock"></div>
 		<div class="contents" id="contents"></div>
 		<div class="chatContents" id="chatContents" style="display:none;"></div>
 	</div>
