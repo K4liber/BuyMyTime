@@ -1,3 +1,4 @@
+
 var subscribeSocketJS;
 var subscribeStomp;
 if(subscribeSocketJS === undefined)
@@ -68,21 +69,18 @@ function handleChatMessage(message){
 }
 
 function handlePaidMessage(message){
-	console.log("handlePaidMessage script.js");
 	var message = JSON.parse(message.body);
-	$("#price").text(message.price);
-	$("#maxTime").text(message.maxTime);
-	$("#dialog").dialog();
+	payingCallMessageDialogHtml(message);
 }
 
 function handlePaidAnswer(message){
-	console.log("handlePaidAnswer script.js");
-	var message = JSON.parse(message.body);
-	if(message.accept){
-		console.log("Akceptacja");
+	var messageBody = JSON.parse(message.body);
+	if(messageBody.accept){
+		acceptPaidAnswerDialogHtml(messageBody);
 	    startClock();
-	}else
-		console.log("Nie akceptacja");
+	} else {
+		declinePaidAnswerDialogHtml(messageBody);
+	}
 }
 
 function call(username){
@@ -193,7 +191,7 @@ function rejectCall(rejected){
 		var answerMessage = {'callingFrom': rejected, 'callingTo': username, 'accept': false};
 	    var payload = JSON.stringify(answerMessage);
 	    setTimeout(function(){
-	    	subscribeStomp.send("/BuyMyTime/answerCall", {}, payload);  
+	    	subscribeStomp.send("/BuyMyTime/callAnswer", {}, payload);  
 	    }, 2000);
 	});
 }
@@ -202,18 +200,15 @@ function startPaid(toId, fromId, price, maxTime){
 	console.log("startPaid script.js");
 	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime};
     var payload = JSON.stringify(answerMessage);
-    setTimeout(function(){
-    	subscribeStomp.send("/BuyMyTime/paidCall", {}, payload);  
-    }, 1000);
+    subscribeStomp.send("/BuyMyTime/paidCall", {}, payload);  
 }
 
 function sendPaidAnswer(toId, fromId, price, maxTime, accept){
-	console.log("sendPaidAnswer script.js");
-	var answerMessage = {'toId': toId, 'fromId': fromId, 'price': price, 'maxTime': maxTime, 'accept': accept};
+	var answerMessage = {'paying': toId, 'receiver': fromId, 'price': price, 'maxTime': maxTime, 'accept': accept};
     var payload = JSON.stringify(answerMessage);
-    setTimeout(function(){
-    	subscribeStomp.send("/BuyMyTime/paidCallAnswer", {}, payload);  
-    }, 500);
+    subscribeStomp.send("/BuyMyTime/paidCallAnswer", {}, payload);
+    if(accept)
+    	startClock();
 }
 
 function getLogin() {
@@ -468,4 +463,14 @@ function sendEndCallMessage(callWith){
 
 function getAddCard(){
 	window.location.href = "newcard";
+}
+
+function categoryProfile(username){
+	$.ajax({
+        type : "GET",
+        url : "profile/" + username,
+        success: function(data){
+        	categoryProfileHtml(data);
+        }
+    });
 }

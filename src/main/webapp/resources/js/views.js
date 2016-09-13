@@ -72,21 +72,61 @@ function contactHtml(userContact) {
 
 function cardsHtml(cards) {
 	var h = [''];
+	h.push('<div class="categoryLeftPanel">');
 	cards.forEach(function(card){
 		h.push('<div id="card' + card.id + '"><a><h2>' + card.title + '<\/h2><\/a>');
 		h.push('<img class="profileImage" src="/BuyMyTime/resources/img/' + card.authorImageName + '"/>');
 		h.push('<button onClick="getUserProfile(\'' + card.userNick + '\')">' + card.userNick + '<\/button>');
 		h.push('<a>' + card.description + '<\/a><\/div>');
 	});
+	h.push('<\/div>');
+	h.push('<div id="categoryRightPanel" class="categoryRightPanel">');
+	h.push('<\/div>');
 	document.getElementById('contents').innerHTML = h.join('');
 	$("#chatContents").hide();
 	$("#contents").show();
 	$(document).ready(function() {
 		cards.forEach(function(card){
 			$("#card" + card.id).click(function(){
-				console.log(card.userNick);
+				categoryProfile(card.userNick);
 		    });
 		});
+	});
+}
+
+function categoryProfileHtml(userProfile){
+	var h = [''];
+	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
+	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/><\/div>');
+	if(userProfile.status){
+		h.push('<div>Online<\/div>');
+	}else{
+		h.push('<div>Offline<\/div>');
+	}
+	if(userProfile.username != document.getElementById('userNick').innerHTML){
+		h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
+		h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
+	}else{
+		h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
+		h.push('<button id="addCard" class="pure-button">Add card<\/button>');
+	}
+	document.getElementById('categoryRightPanel').innerHTML = h.join('');
+	$(document).ready(function() {
+		if(userProfile.username != document.getElementById('userNick').innerHTML){
+			$("#call").click(function(){
+				call(userProfile.username);
+		    });
+			$("#addContact").click(function(){
+				addContact(userProfile.username);
+		    });
+		}else{
+			$("#edit").click(function(){
+				editProfile(userProfile);
+		    });
+			$("#addCard").click(function(){
+				getAddCard();
+		    });
+		}
 	});
 }
 
@@ -103,8 +143,6 @@ function profileHtml(userProfile) {
 	var h = [''];
 	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
 	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/><\/div>');
-	console.log(document.getElementById('userNick').innerHTML);
-	console.log("A username: " + userProfile.username);
 	if(userProfile.status){
 		h.push('<div>Online<\/div>');
 	}else{
@@ -199,10 +237,10 @@ function chatContentHtml(username) {
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button><\/p>');
-	//h.push('<div id="step3">');
+	h.push('<div id="step3">');
 	h.push('<p><button class="pure-button pure-button-error" id="endCall">End call<\/button><\/p>');
-	//h.push('<p><button class="pure-button pure-button-success" id="start">Start<\/button><\/p>');
-	//h.push('<\/div>');
+	h.push('<p><button class="pure-button pure-button-success" id="startPaying">Paying conversation<\/button><\/p>');
+	h.push('<\/div>');
 	h.push('<\/div>');
 	document.getElementById('chatContents').innerHTML = h.join('');
 	$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
@@ -216,6 +254,9 @@ function chatContentHtml(username) {
 		$("#chatSendButton").click(function() {
 			sendChatMessage(document.getElementById('chatWith').innerHTML,
 					$('#chatMessageContent').val());
+		});
+		$("#startPaying").click(function() {
+			payingCallDialogHtml(document.getElementById('chatWith').innerHTML);
 		});
 	});
 }
@@ -240,12 +281,88 @@ function confirmEndCallDialogHtml(callWith) {
 	});
 }
 
+function payingCallDialogHtml(callWith) {
+	var h = [''];
+	h.push('<p>Start a chat at the ' + callWith + ' expense.<\/p>');
+	h.push('<label>Your price: <\/label>');
+	h.push('<input id="price" type="number" min="1"><\/input>$/h');
+	h.push('<label>Max time: <\/label>');
+	h.push('<input id="maxTime" type="number" min="1"><\/input>min');
+	h.push('<div><button id="startPayingChat" class="pure-button pure-button-success">Send<\/button>');
+	h.push('<button id="cancelPayingChat" class="pure-button pure-button-error">Cancel<\/button><\/div>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Lets earn some money" , closeOnEscape: true}).dialog("open");
+		$("#startPayingChat").click( function (){
+			if ( document.getElementById('price').value != null && document.getElementById('maxTime').value != null ){
+				startPaid(callWith, document.getElementById('userNick').innerHTML,
+						document.getElementById('price').value, document.getElementById('maxTime').value);
+				$("#dialog").dialog("close");
+			} else {
+				$("#dialog").append('<div>Your values cannot be empty.</div>');
+			}
+	    });
+		$("#cancelPayingChat").click(function(){
+			$("#dialog").dialog("close");
+	    });
+	});
+}
+
+function payingCallMessageDialogHtml(message){
+	var h = [''];
+	h.push('<p>Request for a chat at your expense with user ' + message.fromId + '.<\/p>');
+	h.push('<label>Price: ' + message.price + '<\/label>');
+	h.push('<label>Max time: ' + message.maxTime + '<\/label>');
+	h.push('<div><button id="agreePayingChat" class="pure-button pure-button-success">Agree<\/button>');
+	h.push('<button id="disagreePayingChat" class="pure-button pure-button-error">Disagree<\/button><\/div>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Chat" , closeOnEscape: true, close: function(){ 
+			sendPaidAnswer(message.toId, message.fromId, message.price, message.maxTime, false); }}).dialog("open");
+		$("#disagreePayingChat").click( function (){
+			$("#dialog").dialog("close");
+	    });
+		$("#agreePayingChat").click(function(){
+			sendPaidAnswer(message.toId, message.fromId, message.price, message.maxTime, true);
+			$("#dialog").dialog({close: function(){ }}).dialog("close");
+	    });
+	});
+	
+}
+
 function callEndDialogHtml(callWith) {
 	var h = [''];
 	h.push('<p>User ' + callWith + ' ended conversation with you.<\/p>');
 	document.getElementById('dialog').innerHTML = h.join('');
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "End of conversation", closeOnEscape: true}).dialog("open");
+	});
+}
+
+function acceptPaidAnswerDialogHtml(message){
+	var h = [''];
+	console.log('acceptPaidAnswerDialogHtml: ' + message);
+	h.push('<p>User ' + message.receiver + ' accept the terms of chat.<\/p>');
+	h.push('<div><button id="ok" class="pure-button pure-button-success">OK<\/button><\/div>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Acceptation" , closeOnEscape: true }).dialog("open");
+		$("#ok").click( function (){
+			$("#dialog").dialog("close");
+	    });
+	});
+}
+
+function declinePaidAnswerDialogHtml(message){
+	var h = [''];
+	h.push('<p>User ' + message.receiver + ' decline the terms of chat.<\/p>');
+	h.push('<div><button id="ok" class="pure-button pure-button-success">OK<\/button><\/div>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Rejection" , closeOnEscape: true }).dialog("open");
+		$("#ok").click( function (){
+			$("#dialog").dialog("close");
+	    });
 	});
 }
 

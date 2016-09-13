@@ -22,8 +22,8 @@ public class PaidConversation {
 	private String maxTime;
 	
 	public PaidConversation(AnswerPaidMessage message) {
-		this.paying = message.getFromId();
-		this.receiver = message.getToId();
+		this.paying = message.getPaying();
+		this.receiver = message.getReceiver();
 		this.price = message.getPrice();
 		this.maxTime = message.getMaxTime();
 	}

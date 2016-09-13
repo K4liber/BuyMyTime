@@ -1,7 +1,14 @@
 package services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 
  
 public class SessionListener implements HttpSessionListener{
@@ -17,4 +24,5 @@ public class SessionListener implements HttpSessionListener{
         System.out.println("==== Session is destroyed ====");
         	
     }
+    
 }

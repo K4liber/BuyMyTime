@@ -1,14 +1,15 @@
 <div class="menu" th:fragment="menuBlock">
-	<div sec:authorize="!hasAuthority('ROLE_USER')">
+	<div sec:authorize="!hasAuthority('ROLE_USER') || !isAuthenticated()">
 		<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
 		<button id="aboutButton" class="ui-button ui-widget ui-corner-all" onclick="getAbout()">About</button>
 		<a th:href="@{/login}"><button id="loginButton" class="ui-button ui-widget ui-corner-all">Sign in</button></a>
 	</div>
-	<div id="menu" sec:authorize="hasAuthority('ROLE_USER')">
+	<div id="menu" sec:authorize="hasAuthority('ROLE_USER')  && isAuthenticated()">
 		<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
 		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getContacts()">Contacts</button>
 		<button id="profileButton" class="ui-button ui-widget ui-corner-all" onClick="getProfile()">Profile</button>
 		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getCards()">Cards</button>
+		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getIssues()">Issues</button>
 		<a th:href="@{/logout}"><button id="loginButton" class="ui-button ui-widget ui-corner-all">Logout</button></a>
 	</div>
 </div>

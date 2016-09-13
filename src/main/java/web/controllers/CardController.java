@@ -1,4 +1,4 @@
-package web;
+package web.controllers;
 
 import java.security.Principal;
 import java.util.List;
@@ -21,6 +21,7 @@ import repositories.CardRepository;
 import repositories.CardTagRepository;
 import repositories.CategoryRepository;
 import repositories.TagToCardRepository;
+import repositories.UserProfileRepository;
 import repositories.UserRepository;
 import data.entities.Card;
 import data.entities.CardModel;
@@ -28,12 +29,15 @@ import data.entities.CardTag;
 import data.entities.Category;
 import data.entities.TagToCard;
 import data.entities.User;
+import data.entities.UserProfile;
 
 @Controller
 public class CardController {
 	
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	UserProfileRepository userProfileRepository;
 	@Autowired
 	CardRepository cardRepository;
 	@Autowired
@@ -79,8 +83,10 @@ public class CardController {
 		
 		Card cardFromModel = cardModel.getCard();
 		User user = userRepository.findByUsername(principal.getName());
+		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
 		cardFromModel.setUserId(user.getId());
 		cardFromModel.setUserNick(user.getUsername());
+		cardFromModel.setAuthorImageName(userProfile.getImageName());
 		Card savedCard = cardRepository.save(cardModel.getCard());
 		
 		String tagsTable[] = cardModel.getTags().split(" ");

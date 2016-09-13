@@ -2,6 +2,8 @@ package data.views;
 
 import java.util.List;
 
+import data.entities.UserProfile;
+
 public class UserContact {
 
 	private UserProfile profile;

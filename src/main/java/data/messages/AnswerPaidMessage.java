@@ -2,24 +2,13 @@ package data.messages;
 
 public class AnswerPaidMessage {
 	
-	private String toId;
-    private String fromId;
+	private String paying;
+    private String receiver;
     private String price;
     private String maxTime;
     private boolean accept;
     
-	public String getToId() {
-		return toId;
-	}
-	public void setToId(String toId) {
-		this.toId = toId;
-	}
-	public String getFromId() {
-		return fromId;
-	}
-	public void setFromId(String fromId) {
-		this.fromId = fromId;
-	}
+
 	public String getPrice() {
 		return price;
 	}
@@ -37,6 +26,18 @@ public class AnswerPaidMessage {
 	}
 	public void setAccept(boolean accept) {
 		this.accept = accept;
+	}
+	public String getPaying() {
+		return paying;
+	}
+	public void setPaying(String paying) {
+		this.paying = paying;
+	}
+	public String getReceiver() {
+		return receiver;
+	}
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
 	}
 
 }

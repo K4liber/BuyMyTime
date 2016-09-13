@@ -1,4 +1,4 @@
-package web;
+package web.controllers;
 
 import java.security.Principal;
 import java.util.Date;
@@ -81,7 +81,8 @@ public class VideoCallController {
     		paidConversation.setConversationPoint((new Date()).toString());
     		paidConversationRepository.save(paidConversation);
     	}
-        messaging.convertAndSendToUser(message.getToId(), "/queue/paidAnswer", message);
+    	System.out.println(message.getReceiver() + " paying: " + message.getPaying());
+        messaging.convertAndSendToUser(message.getReceiver(), "/queue/paidAnswer", message);
     }
     
     @MessageMapping("/message")

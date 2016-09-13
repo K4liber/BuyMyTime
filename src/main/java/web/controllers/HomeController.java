@@ -1,4 +1,4 @@
-package web;
+package web.controllers;
 
 import java.security.Principal;
 import java.util.List;
