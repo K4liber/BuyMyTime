@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -73,13 +74,10 @@ public class CardController {
 	}
 	
 	@RequestMapping(value = { "/newcard" }, method = RequestMethod.POST)
-	public String login(HttpServletRequest request, @ModelAttribute(value="cardModel") @Valid CardModel cardModel,
-			BindingResult bindingCardModelResult, RedirectAttributes model, Principal principal) throws Exception {
+	public String newCard(@RequestBody CardModel cardModel,
+			RedirectAttributes model, Principal principal) throws Exception {
 		System.out.println("Nazzwa: " + cardModel.getCard().getCategoryName());
-		if(bindingCardModelResult.hasErrors()){
-			System.out.println(bindingCardModelResult.toString());
-			return "cardForm";
-		}
+
 		
 		Card cardFromModel = cardModel.getCard();
 		User user = userRepository.findByUsername(principal.getName());
@@ -91,6 +89,31 @@ public class CardController {
 		
 		String tagsTable[] = cardModel.getTags().split(" ");
 
+		for(int ii=0;ii<tagsTable.length;ii++){
+			CardTag cardTag = new CardTag();
+			cardTag.setTitle(tagsTable[ii]);
+			CardTag savedCardTag = cardTagRepository.save(cardTag);
+			TagToCard tagToCard = new TagToCard();
+			tagToCard.setCardId(savedCard.getId());
+			tagToCard.setTagId(savedCardTag.getId());
+			tagToCardRepository.save(tagToCard);
+		}
+		
+	    return "home";
+	}
+	
+	@RequestMapping(value = { "/example" }, method = RequestMethod.POST)
+	public String example(@RequestBody CardModel cardModel,
+			RedirectAttributes model, Principal principal) throws Exception {
+
+		Card cardFromModel = cardModel.getCard();
+		User user = userRepository.findByUsername(principal.getName());
+		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
+		cardFromModel.setUserId(user.getId());
+		cardFromModel.setUserNick(user.getUsername());
+		cardFromModel.setAuthorImageName(userProfile.getImageName());
+		Card savedCard = cardRepository.save(cardModel.getCard());
+		String tagsTable[] = cardModel.getTags().split(" ");
 		for(int ii=0;ii<tagsTable.length;ii++){
 			CardTag cardTag = new CardTag();
 			cardTag.setTitle(tagsTable[ii]);

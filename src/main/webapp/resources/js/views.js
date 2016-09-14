@@ -18,6 +18,55 @@ function homeHtml(categories) {
 	});
 }
 
+function editProfileHtml(userProfile) {
+	var h = [''];
+	h.push('<form action="" id="editProfile" method="post" enctype="multipart/form-data" >');
+	h.push('<div>Username: <span id="username">' + userProfile.username + '</span></div>');
+	h.push('<div>Email: <span id="email">' + userProfile.email + '</span></div>');
+	h.push('<div>Profile photo: <input type="file" name="file" required id="upload"></div>');
+	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/></div>');
+	h.push('<input type="submit" value="Load photo" />');
+	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
+	$(document).ready(function() {
+		$("#editProfile").submit(function(e){
+		    e.preventDefault();
+			var formdata = new FormData(this);
+			postProfileImage(formdata);
+		});
+	});
+}
+
+function addNewCardHtml(){
+	var h = [''];
+	h.push('<form action="" id="addCard" method="post">');
+	h.push('<label>Title</label>:');
+	h.push('<input  type="text" id="cardTitle">');
+	h.push('<label>Tags</label>:');
+	h.push('<input  type="text" id="tags">');
+	h.push('<label>Category</label>:');
+	h.push('<input  type="text" id="categoryName">');
+	h.push('<label>Description</label>:');
+	h.push('<textarea cols="50" rows="5" id="description"></textarea>');
+	h.push('<input type="submit" value="Add card" />');
+	h.push('</form>');
+	document.getElementById('contents').innerHTML = h.join('');
+	$("#chatContents").hide();
+	$("#contents").show();
+	$(document).ready(function() {
+		$("#addCard").submit(function(e){
+			e.preventDefault();
+			var cardData = {};
+			cardData["title"] = $("#cardTitle").val();
+			cardData["categoryName"] = $("#categoryName").val();
+			cardData["description"] = $("#description").val();
+			var cardModelData = JSON.stringify( {card: cardData, tags:  $("#tags").val()} );
+			postCardModel(cardModelData);
+		});
+	});
+}
+
 function contactsHtml(userProfiles) {
 	var h = [''];
 	h.push('<div class="contactsPanel">');
@@ -169,7 +218,7 @@ function profileHtml(userProfile) {
 				editProfile(userProfile);
 		    });
 			$("#addCard").click(function(){
-				getAddCard();
+				addCard();
 		    });
 		}
 	});

@@ -1,4 +1,3 @@
-
 var subscribeSocketJS;
 var subscribeStomp;
 if(subscribeSocketJS === undefined)
@@ -166,17 +165,6 @@ function peerCall(callingTo) {
     });
 }
 
-function getUsername(onSuccess) {
-	console.log("getUsername script.js");
-	$.ajax({
-        type : "GET",
-        url : "username",
-        success: function(data){
-        	onSuccess(data);
-        }
-    });
-}
-
 function rejectCallClick() {
 	$("#dialog").dialog("close"); 
 }
@@ -211,124 +199,8 @@ function sendPaidAnswer(toId, fromId, price, maxTime, accept){
     	startClock();
 }
 
-function getLogin() {
-	$.ajax({
-        type : "GET",
-        url : "login",
-        success: function(data){
-        	homeHtml(data);
-        }
-    });
-}
-
-function getHome() {
-	$.ajax({
-        type : "GET",
-        url : "categories",
-        success: function(data){
-        	homeHtml(data);
-        }
-    });
-}
-
-function getCards() {
-	$.ajax({
-        type : "GET",
-        url : "cards",
-        success: function(data){
-        	cardsHtml(data);
-        }
-    });
-}
-
-function getCardsByCategory(categoryName) {
-	$.ajax({
-        type : "GET",
-        url : "cards/" + categoryName,
-        success: function(data){
-        	cardsHtml(data);
-        }
-    });
-}
-
-function getProfile() {
-	$.ajax({
-        type : "GET",
-        url : "username",
-        success: function(data){
-        	getUserProfile(data);
-        }
-    });
-}
-
-function getUserProfile(username){
-	$.ajax({
-        type : "GET",
-        url : "profile/" + username,
-        success: function(data){
-        	profileHtml(data);
-        }
-    });
-}
-
-function getContacts(){
-	$.ajax({
-        type : "GET",
-        url : "contacts",
-        success: function(data){
-        	contactsHtml(data);
-        }
-    });
-}
-
-function addContact(contactUsername){
-	$.ajax({
-        type : "GET",
-        url : "addContact/" + contactUsername,
-        success: function(data){
-        	if(data == "success"){
-        		successContactDialogAddHtml(contactUsername);
-        	}else if(data == "exist"){
-        		existContactDialogHtml(contactUsername);
-        	}
-        }
-    });
-}
-
 function editProfile(userProfile){
-	window.location.href = "edit";
-}
-
-function getContact(contactUsername){
-	$.ajax({
-        type : "GET",
-        url : "contact/" + contactUsername,
-        success: function(data){
-        	contactHtml(data);
-        }
-    });
-}
-
-function getLogout() {
-	$.ajax({
-        type : "GET",
-        url : "logout",
-        success: function(data){
-        }
-    });
-}
-
-function getAbout() {
-	$.ajax({
-        type : "GET",
-        url : "about",
-        data : {
-        "username" : "bolek"
-        },
-        success: function(data){
-        	aboutHtml(data);
-        }
-    });
+	editProfileHtml(userProfile);
 }
 
 function sendChatMessage(sendTo, messageContent){
@@ -461,16 +333,6 @@ function sendEndCallMessage(callWith){
     subscribeStomp.send("/BuyMyTime/callEnd", {}, payload); 
 }
 
-function getAddCard(){
-	window.location.href = "newcard";
-}
-
-function categoryProfile(username){
-	$.ajax({
-        type : "GET",
-        url : "profile/" + username,
-        success: function(data){
-        	categoryProfileHtml(data);
-        }
-    });
+function addCard(){
+	addNewCardHtml();
 }

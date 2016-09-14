@@ -14,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import data.entities.PaidConversation;
+import data.entities.PeerConnection;
 import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
 import data.messages.CallMessage;
@@ -25,6 +26,7 @@ import org.springframework.messaging.simp.annotation.*;
 
 import repositories.ChatMessageRepository;
 import repositories.PaidConversationRepository;
+import repositories.PeerConnectionRepository;
 import repositories.UserRepository;
 
 @Controller
@@ -38,6 +40,9 @@ public class VideoCallController {
 	
 	@Autowired
 	private PaidConversationRepository paidConversationRepository;
+	
+	@Autowired
+	private PeerConnectionRepository peerConnectionRepository;
 	
     @MessageMapping("/call")
     public void call(Principal principal, CallMessage message) throws InterruptedException{
@@ -64,6 +69,8 @@ public class VideoCallController {
     @MessageMapping("/callAnswer")
     public void answerTheCall(Principal principal, AnswerCallMessage message) throws InterruptedException{
         messaging.convertAndSendToUser(message.getCallingFrom(), "/queue/callAnswer", message);
+        PeerConnection peerConnection = new PeerConnection(message);
+        peerConnectionRepository.save(peerConnection);
     }
     
     @MessageMapping("/paidCall")

@@ -3,6 +3,7 @@ package web.controllers;
 import java.io.IOException;
 import java.security.Principal;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -14,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import data.entities.User;
@@ -38,7 +41,12 @@ public class UserController {
 	UserRoleRepository userRoleRepository;
 	@Autowired
 	UserProfileRepository userProfileRepository;
-
+	
+	@RequestMapping(value="/example", method=RequestMethod.GET)
+	public String example( Model model){
+		return "example";
+	}
+	
 	@RequestMapping(value="/register", method=RequestMethod.GET)
 	public String showRegistrationForm( Model model){
 		model.addAttribute("user", new User());
@@ -62,10 +70,10 @@ public class UserController {
 	@RequestMapping(value="/user/{username}", method=RequestMethod.GET)
 	@ResponseBody
 	public User getUser(@PathVariable("username") String username, Principal principal, Model model){
-		if(principal.getName().equals(username)){
-		User user = userRepository.findByUsername(username);
-		return user;
-		}else{
+		if (principal.getName().equals(username)){
+			User user = userRepository.findByUsername(username);
+			return user;
+		} else {
 			return null;
 		}
 	}

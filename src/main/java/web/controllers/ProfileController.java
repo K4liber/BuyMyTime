@@ -117,14 +117,6 @@ public class ProfileController {
 			return "error";
 	}
 	
-	@RequestMapping(value="/edit", method=RequestMethod.GET)
-	public String showEditForm( Model model, Principal principal){
-		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
-		model.addAttribute("username", principal.getName());
-		model.addAttribute("userProfile", userProfile);
-		return "edit";
-	}
-	
 	@RequestMapping(value="/edit", method=RequestMethod.POST)
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
         Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
