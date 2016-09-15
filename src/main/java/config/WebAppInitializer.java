@@ -5,9 +5,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import services.SessionListener;
+import web.services.SessionListener;
 
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 	
@@ -37,7 +38,6 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	@Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         super.onStartup(servletContext);
-        //servletContext.addListener(new SessionListener());
     }
 	
 }

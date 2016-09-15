@@ -1,3 +1,23 @@
+function loadOverlapsHtml(usernames){
+	usernames.forEach(function(username){
+	$("#menu").append('<button id="callOverlap' + username + '" class="ui-button ui-widget ui-corner-all"' + 
+			' style="float:right;">' + username + '</button>');
+	});
+	$(document).ready(function(){
+		usernames.forEach(function(username){
+			$("#callOverlap" + username).click(function(){
+				showChat(username);
+			});
+		});
+	});
+}
+
+
+function removeCallOverlapHtml(username){
+	console.log("removing");
+	$("#callOverlap" + username).remove();
+}
+
 function homeHtml(categories) {
 	var h = [''];
 	categories.forEach(function(category){
@@ -292,7 +312,7 @@ function chatContentHtml(username) {
 	h.push('<\/div>');
 	h.push('<\/div>');
 	document.getElementById('chatContents').innerHTML = h.join('');
-	$("#menu").append('<button id="callOverlap" class="ui-button ui-widget ui-corner-all"' + 
+	$("#menu").append('<button id="callOverlap' + username + '" class="ui-button ui-widget ui-corner-all"' + 
 			' style="float:right;" onClick="showChat()">' + username + '</button>');
 	$("#chatContents").show();
 	$("#contents").hide();

@@ -1,3 +1,13 @@
+function getEndCall(username){
+	$.ajax({
+        type : "GET",
+        url : "endCall/" + username,
+        success: function(data){
+        	console.log(data);
+        }
+    });
+}
+
 function postProfileImage(formdata){
 	$.ajax({
         url: "edit",
@@ -168,12 +178,20 @@ function getLogout() {
     });
 }
 
+function getExit() {
+	$.ajax({
+		type: "GET",
+		url: "exit"
+	});
+}
+
 function getUsername(onSuccess) {
 	$.ajax({
         type : "GET",
         url : "username",
         success: function(data){
-        	onSuccess(data);
+        	if(data != "err")
+        		onSuccess(data);
         }
     });
 }

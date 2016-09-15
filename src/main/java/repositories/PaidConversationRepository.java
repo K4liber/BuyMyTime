@@ -12,4 +12,8 @@ import data.entities.PaidConversation;
 @Transactional
 public interface PaidConversationRepository extends JpaRepository<PaidConversation, Long>{
 	List<PaidConversation> findAllByPayingAndReceiver(String paying, String receiver);
+	List<PaidConversation> findAllByPayingAndEnded(String username, boolean ended);
+	List<PaidConversation> findAllByReceiverAndEnded(String username, boolean ended);
+	PaidConversation findByPayingAndReceiverAndEnded(String username,
+			String connectionUsername, boolean ended);
 }

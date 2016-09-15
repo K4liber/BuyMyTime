@@ -19,10 +19,12 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import web.services.SessionListener;
+
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages={"repositories"})
-@ComponentScan(basePackages={"data","services"},
+@ComponentScan(basePackages={"data","services", "web"},
 	excludeFilters={
 		@Filter(type=FilterType.ANNOTATION, value = EnableWebMvc.class)
 })

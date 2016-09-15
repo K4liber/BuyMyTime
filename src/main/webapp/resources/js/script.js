@@ -1,11 +1,21 @@
 var subscribeSocketJS;
 var subscribeStomp;
-if(subscribeSocketJS === undefined)
+var peer;
+
+//If power off browser
+window.onbeforeunload = getUsername(function(success){
+	getExit();
+});
+
+//If Logged in
+getUsername(function(success){
+	login();
+});
+
+function loadStomp(){
 	subscribeSocketJS = new SockJS('http://localhost:8080/BuyMyTime/greeting');	
-if(subscribeStomp === undefined){
 	subscribeStomp = Stomp.over(subscribeSocketJS);
 	subscribeStomp.connect('guest', 'guest', function(frame){
-    	console.log("Connected to subsriber.");
      	subscribeStomp.subscribe('/user/queue/call', handleCall);
      	subscribeStomp.subscribe('/user/queue/callAnswer', handleCallAnswer);
      	subscribeStomp.subscribe('/user/queue/callEnd', handleCallEnd);
@@ -15,10 +25,8 @@ if(subscribeStomp === undefined){
     });
 }
 
-var peer;
-
-function handleCallEnd(message){
-	
+function login(){
+	loadStomp();
 }
 
 function handleCall(call){
@@ -60,15 +68,15 @@ function handleCallAnswer(callAnswer){
 	}
 }
 
-function handleChatMessage(message){
+function handleChatMessage(chatMessage){
 	console.log("handleChatMessage script.js");
-	var message = JSON.parse(message.body);
+	var message = JSON.parse(chatMessage.body);
 	$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
 	$("#chatMessagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
 }
 
-function handlePaidMessage(message){
-	var message = JSON.parse(message.body);
+function handlePaidMessage(paidMessage){
+	var message = JSON.parse(paidMessage.body);
 	payingCallMessageDialogHtml(message);
 }
 
@@ -225,7 +233,7 @@ function sendMessage(sendTo){
 
 $(function(){
 	$('#send').click(function(){
-  	  var messageContent = $('#messageContent').val()
+  	  var messageContent = $('#messageContent').val();
   	  var sendFrom = document.getElementById("yourid").innerText;
   	  var sendTo = document.getElementById("id").innerText;
   	  $("#messagesList").append('<li>' + messageContent + '</li>');
@@ -287,9 +295,6 @@ function step3 (call) {
 function startClock() {
   	
 	var startTime = new Date();
-    var startHours = startTime.getHours();
-	var startMinutes = startTime.getMinutes();
-	var startSeconds = startTime.getSeconds();
 	$(".clock").show();
       
     setInterval(function(){
@@ -314,13 +319,15 @@ function startClock() {
     
 }
 
-function showChat(){
+function showChat(username){
+	console.log(username);
 	$("#chatContents").show();
 	$("#contents").hide();
 }
 
 function endCall(callWith) {
-	$("#callOverlap").remove();
+	removeCallOverlapHtml(callWith);
+	getEndCall(callWith);
 	getHome();
 	peer.destroy();
 	window.localStream.getVideoTracks()[0].stop();

@@ -17,9 +17,11 @@ public class PaidConversation {
 	private String receiver;
 	private String conversationStart;
 	private String conversationPoint;
-	private Boolean ended;
+	private boolean ended;
 	private String price;
 	private String maxTime;
+	
+	public PaidConversation(){};
 	
 	public PaidConversation(AnswerPaidMessage message) {
 		this.paying = message.getPaying();
@@ -68,14 +70,6 @@ public class PaidConversation {
 		this.conversationPoint = conversationPoint;
 	}
 
-	public Boolean getEnded() {
-		return ended;
-	}
-
-	public void setEnded(Boolean ended) {
-		this.ended = ended;
-	}
-
 	public String getPrice() {
 		return price;
 	}
@@ -90,6 +84,14 @@ public class PaidConversation {
 
 	public void setMaxTime(String maxTime) {
 		this.maxTime = maxTime;
+	}
+
+	public boolean isEnded() {
+		return ended;
+	}
+
+	public void setEnded(boolean ended) {
+		this.ended = ended;
 	}
 
 }

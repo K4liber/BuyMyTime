@@ -9,9 +9,6 @@
 </head>
 <body>
 	<sec:authorize access="hasRole('ROLE_USER') && isAuthenticated()" var="isUser"></sec:authorize>
-	<script>
-		var username = "${username}";
-	</script>
 	<span id="userNick" th:text="${username}" style="display:none;">username</span>
 	<header id="header" class="alt" th:include="header :: headerMenu"></header>
 	<script>

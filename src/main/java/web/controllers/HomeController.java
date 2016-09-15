@@ -27,8 +27,9 @@ public class HomeController {
 		List<Category> categories = categoryRepository.findAll();
 		model.addAttribute("categories",categories);
 		model.addAttribute("user", new User());
-		if(principal != null)
+		if(principal != null){
 			model.addAttribute("username", principal.getName());
+		}
 		return "home";
 	}
 	
