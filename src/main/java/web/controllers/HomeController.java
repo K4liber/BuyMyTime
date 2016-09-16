@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import repositories.CategoryRepository;
+import repositories.PeerConnectionRepository;
 import data.entities.Category;
+import data.entities.PeerConnection;
 import data.entities.User;
 
 @RequestMapping
@@ -21,6 +23,8 @@ public class HomeController {
 	
 	@Autowired
 	CategoryRepository categoryRepository;
+	@Autowired
+	private PeerConnectionRepository peerConnectionRepository;
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	public String home(Principal principal, Model model){
@@ -30,9 +34,26 @@ public class HomeController {
 		if(principal != null){
 			model.addAttribute("username", principal.getName());
 		}
+		if(principal != null)
+			endAllSuspendedConnections(principal.getName());
 		return "home";
 	}
 	
+	private void endAllSuspendedConnections(String username) {
+		List<PeerConnection> peerConnections = peerConnectionRepository
+				.findAllByPayingAndEnded(username, false);
+		for(PeerConnection peerConnection : peerConnections){
+            peerConnection.setEnded(true);
+            peerConnectionRepository.save(peerConnection);
+		}
+		peerConnections = peerConnectionRepository
+				.findAllByReceiverAndEnded(username, false);
+		for(PeerConnection peerConnection : peerConnections){
+            peerConnection.setEnded(true);
+            peerConnectionRepository.save(peerConnection);
+		}
+	}
+
 	@RequestMapping(value="/categories", method=RequestMethod.GET)
 	@ResponseBody
 	public List<Category> categories(Model model){

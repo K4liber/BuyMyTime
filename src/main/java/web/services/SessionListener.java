@@ -8,18 +8,21 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import data.entities.PaidConversation;
-import repositories.PaidConversationRepository;
+import data.entities.PeerConnection;
+import data.messages.CallMessage;
+import repositories.PeerConnectionRepository;
 
 @WebListener
 public class SessionListener implements HttpSessionListener{
 	
-	private PaidConversationRepository paidConversationRepository;
+	private PeerConnectionRepository peerConnectionRepository;
+	private SimpMessagingTemplate messaging;
 	
     @Override
     public void sessionCreated(HttpSessionEvent event) {
@@ -31,33 +34,36 @@ public class SessionListener implements HttpSessionListener{
     	User user = (User) ((SecurityContext)SecurityContextHolder.getContext())
     			.getAuthentication().getPrincipal();
     	String username = user.getUsername();
-    	System.out.println("Username: " + username);
         System.out.println("==== Session is destroyed ====");
         final ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(event.getSession().getServletContext());
-        final PaidConversationRepository service = ctx.getBean(PaidConversationRepository.class);
-        this.paidConversationRepository = service;
-        endAllConnections(username);
+        final PeerConnectionRepository service = ctx.getBean(PeerConnectionRepository.class);
+        final SimpMessagingTemplate service2 = ctx.getBean(SimpMessagingTemplate.class);
+        this.peerConnectionRepository = service;
+        this.messaging = service2;
+        endConnection(username);
     }
 
-	private void endAllConnections(String username) {
-		List<PaidConversation> paidConversations = paidConversationRepository
-				.findAllByPayingAndEnded(username, false);
-		if(paidConversations != null)
-			endAllConnections(username, paidConversations);
-		List<PaidConversation> paidConversations2 = paidConversationRepository
-				.findAllByReceiverAndEnded(username, false);
-		if(paidConversations2 != null)
-			endAllConnections(username, paidConversations2);
+	private void endConnection(String username) {
+		PeerConnection peerConnection = peerConnectionRepository
+				.findByReceiverAndEnded(username, false);
+		if(peerConnection != null){
+			peerConnection.setEnded(true);
+			peerConnectionRepository.save(peerConnection);
+			sendEnd(username, peerConnection.getPaying());
+		}
+		peerConnection = peerConnectionRepository
+				.findByPayingAndEnded(username, false);
+		if(peerConnection != null){
+			peerConnection.setEnded(true);
+			peerConnectionRepository.save(peerConnection);
+			sendEnd(username, peerConnection.getReceiver());
+		}
 	}
 	
-	private void endAllConnections(String username, List<PaidConversation> paidConversations) {
-		for(Iterator<PaidConversation> i = paidConversations.iterator(); i.hasNext(); ) {
-			PaidConversation item = i.next();
-		    if(!item.isEnded()){
-		    	item.setEnded(true);
-		    	paidConversationRepository.save(item);
-		    }	
-		}	
+	private void sendEnd(String username, String sendTo){
+		CallMessage callMessage = new CallMessage();
+        callMessage.setName(username);
+        messaging.convertAndSendToUser(sendTo, "/queue/callEnd", callMessage);
 	}
 	
 }

@@ -1,33 +1,38 @@
 package data.entities;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
 
 @Entity
-public class PaidConversation {
+public class PeerConnection {
 	
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	private String paying;
 	private String receiver;
-	private String conversationStart;
-	private String conversationPoint;
+	private String startPoint;
+	private String endPoint;
 	private boolean ended;
 	private String price;
 	private String maxTime;
 	
-	public PaidConversation(){};
-	
-	public PaidConversation(AnswerPaidMessage message) {
+	public PeerConnection(){};
+
+	public PeerConnection(AnswerPaidMessage message) {
 		this.paying = message.getPaying();
 		this.receiver = message.getReceiver();
 		this.price = message.getPrice();
 		this.maxTime = message.getMaxTime();
+		this.startPoint = (new Date()).toString();
+		this.endPoint = (new Date()).toString();
 	}
 
 	public Long getId() {
@@ -54,22 +59,6 @@ public class PaidConversation {
 		this.receiver = receiver;
 	}
 
-	public String getConversationStart() {
-		return conversationStart;
-	}
-
-	public void setConversationStart(String conversationStart) {
-		this.conversationStart = conversationStart;
-	}
-
-	public String getConversationPoint() {
-		return conversationPoint;
-	}
-
-	public void setConversationPoint(String conversationPoint) {
-		this.conversationPoint = conversationPoint;
-	}
-
 	public String getPrice() {
 		return price;
 	}
@@ -92,6 +81,22 @@ public class PaidConversation {
 
 	public void setEnded(boolean ended) {
 		this.ended = ended;
+	}
+
+	public String getStartPoint() {
+		return startPoint;
+	}
+
+	public void setStartPoint(String startPoint) {
+		this.startPoint = startPoint;
+	}
+
+	public String getEndPoint() {
+		return endPoint;
+	}
+
+	public void setEndPoint(String endPoint) {
+		this.endPoint = endPoint;
 	}
 
 }

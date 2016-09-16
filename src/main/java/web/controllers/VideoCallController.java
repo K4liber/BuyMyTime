@@ -13,18 +13,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import data.entities.PaidConversation;
+import data.entities.PeerConnection;
 import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
 import data.messages.CallMessage;
 import data.messages.ChatMessage;
 import data.messages.PaidMessage;
+import data.messages.TimeUpdateMessage;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.*;
 
 import repositories.ChatMessageRepository;
-import repositories.PaidConversationRepository;
+import repositories.PeerConnectionRepository;
 import repositories.UserRepository;
 
 @Controller
@@ -37,7 +38,7 @@ public class VideoCallController {
 	private ChatMessageRepository chatMessageRepository;
 	
 	@Autowired
-	private PaidConversationRepository paidConversationRepository;
+	private PeerConnectionRepository peerConnectionRepository;
 	
     @MessageMapping("/call")
     public void call(Principal principal, CallMessage message) throws InterruptedException{
@@ -67,21 +68,16 @@ public class VideoCallController {
     }
     
     @MessageMapping("/paidCall")
-    public void paidCall(Principal principal, PaidMessage message) throws InterruptedException{
-        System.out.println("Prosba o platna rozmowe: " 
-    + message.getFromId()+ ", " + message.getToId() + ", " + message.getPrice() + ", " + message.getMaxTime());   
+    public void paidCall(Principal principal, PaidMessage message) throws InterruptedException{ 
         messaging.convertAndSendToUser(message.getToId(), "/queue/paid", message);
     }
     
     @MessageMapping("/paidCallAnswer")
     public void paidCallAnswer(Principal principal, AnswerPaidMessage message) throws InterruptedException{ 
     	if(message.isAccept()){
-    		PaidConversation paidConversation = new PaidConversation(message);
-    		paidConversation.setConversationStart((new Date()).toString());
-    		paidConversation.setConversationPoint((new Date()).toString());
-    		paidConversationRepository.save(paidConversation);
+			PeerConnection peerConnection = new PeerConnection(message);
+    		peerConnectionRepository.save(peerConnection);
     	}
-    	System.out.println(message.getReceiver() + " paying: " + message.getPaying());
         messaging.convertAndSendToUser(message.getReceiver(), "/queue/paidAnswer", message);
     }
     
@@ -92,6 +88,24 @@ public class VideoCallController {
         messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", message);
         message.setDateTime(new Date().toString());
         chatMessageRepository.save(message);
+    }
+    
+    @MessageMapping("/timeUpdate")
+    public void timeUpdate(Principal principal, TimeUpdateMessage message) throws InterruptedException{
+    	System.out.println("TUTAJ JEST");
+    	String username = principal.getName();
+    	PeerConnection peerConnection = peerConnectionRepository
+    			.findByReceiverAndEnded(username, false);
+    	if(peerConnection != null){
+    		peerConnection.setEndPoint((new Date()).toString());
+    		peerConnectionRepository.save(peerConnection);
+    	}
+    	peerConnection = peerConnectionRepository
+    			.findByPayingAndEnded(username, false);
+    	if(peerConnection != null){
+    		peerConnection.setEndPoint((new Date()).toString());
+    		peerConnectionRepository.save(peerConnection);
+    	}
     }
     
 }

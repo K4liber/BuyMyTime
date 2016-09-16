@@ -16,33 +16,31 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import data.entities.Contact;
-import data.entities.PaidConversation;
+import data.entities.PeerConnection;
 import data.entities.User;
 import data.entities.UserProfile;
-import repositories.PaidConversationRepository;
+import repositories.PeerConnectionRepository;
 
 @Controller
 public class PeerController {
 	
 	@Autowired
-	private PaidConversationRepository paidConversationRepository;
+	private PeerConnectionRepository peerConnectionRepository;
 	
 	@RequestMapping(value="/endCall/{callWith}", method=RequestMethod.GET)
 	@ResponseBody
 	public String endCall(Principal principal, Model model, HttpSession session, 
 			@PathVariable("callWith") String callWith){
 		String username = principal.getName();
-		PaidConversation paidConversation = paidConversationRepository
-				.findByPayingAndReceiverAndEnded(username, callWith, false);
-		PaidConversation paidConversation2 = paidConversationRepository
-				.findByPayingAndReceiverAndEnded(callWith, username, false);
+		PeerConnection paidConversation = peerConnectionRepository
+				.findByPayingAndEnded(username, false);
+		if(paidConversation == null){
+			paidConversation = peerConnectionRepository
+				.findByReceiverAndEnded(username, false);
+		}
 		if(paidConversation != null){
 			paidConversation.setEnded(true);
-			paidConversationRepository.save(paidConversation);
-		}
-		if(paidConversation2 != null){
-			paidConversation2.setEnded(true);
-			paidConversationRepository.save(paidConversation2);
+			peerConnectionRepository.save(paidConversation);
 		}
 		return null;
 	}

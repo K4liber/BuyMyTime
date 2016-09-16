@@ -2,10 +2,7 @@ package web.controllers;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -17,19 +14,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import data.entities.PaidConversation;
 import data.entities.User;
 import data.entities.UserProfile;
 import data.entities.UserRole;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import repositories.PaidConversationRepository;
+import repositories.PeerConnectionRepository;
 import repositories.UserProfileRepository;
 import repositories.UserRepository;
 import repositories.UserRoleRepository;
@@ -38,7 +32,7 @@ import repositories.UserRoleRepository;
 public class UserController {
 	
 	@Autowired
-	private PaidConversationRepository paidConversationRepository;
+	private PeerConnectionRepository paidConversationRepository;
 	@Autowired
 	private SessionRegistry sessionRegistry;
 	@Autowired
@@ -65,7 +59,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
-	public String logoutRequest(HttpSession session){
+	public String logoutRequest(HttpSession session, Principal principal){
 		sessionRegistry.removeSessionInformation(session.getId());
 		if(session.getAttribute("user") != null){
 			session.invalidate();
@@ -91,8 +85,6 @@ public class UserController {
 			return "error";
 		else {
 			sessionRegistry.removeSessionInformation(session.getId());
-			System.out.println("Wypierdolilo z butow uzytkownika " + principal.getName());
-			endAllConnections(principal.getName());
 			if(session.getAttribute("user") != null){
 				session.invalidate();
 			}
@@ -100,27 +92,6 @@ public class UserController {
 		}
 	}
 	
-	private void endAllConnections(String username) {
-		List<PaidConversation> paidConversations = paidConversationRepository
-				.findAllByPayingAndEnded(username, false);
-		if(paidConversations != null)
-			endAllConnections(username, paidConversations);
-		List<PaidConversation> paidConversations2 = paidConversationRepository
-				.findAllByReceiverAndEnded(username, false);
-		if(paidConversations2 != null)
-			endAllConnections(username, paidConversations2);
-	}
-	
-	private void endAllConnections(String username, List<PaidConversation> paidConversations) {
-		for(Iterator<PaidConversation> i = paidConversations.iterator(); i.hasNext(); ) {
-			PaidConversation item = i.next();
-		    if(!item.isEnded()){
-		    	item.setEnded(true);
-		    	paidConversationRepository.save(item);
-		    }	
-		}	
-	}
-
 	@RequestMapping(value="/username", method=RequestMethod.GET)
 	@ResponseBody
 	public String getUsername(Principal principal, Model model){

@@ -1,11 +1,8 @@
 var subscribeSocketJS;
 var subscribeStomp;
 var peer;
-
-//If power off browser
-window.onbeforeunload = getUsername(function(success){
-	getExit();
-});
+var checkingConnection;
+var timeUpdate;
 
 //If Logged in
 getUsername(function(success){
@@ -85,6 +82,7 @@ function handlePaidAnswer(message){
 	if(messageBody.accept){
 		acceptPaidAnswerDialogHtml(messageBody);
 	    startClock();
+	    startSendingTimeUpdate();
 	} else {
 		declinePaidAnswerDialogHtml(messageBody);
 	}
@@ -121,18 +119,27 @@ function answerCall(callingFrom){
     });
     peer.on('call', function(call){
       call.answer(window.localStream);
+      dataConnection = peer.connect(call.peer, {});
+      callStatus = true;
+      startCheckingConnection(call.peer);
       step3(call);
     });
     peer.on('error', function(err){
-      alert(err.message);
-      step2();
+    	if(err.type == "peer-unavailable"){
+    		handlePeerUnavailableError(callingFrom);
+		}else{
+		    alert(err.message);
+		    step2();
+		    console.log(err.type);
+		}
     });
+    
 	getUsername(function(callingTo) {
 		var answerMessage = {'callingFrom': callingFrom, 'callingTo': callingTo, 'accept': true};
 	    var payload = JSON.stringify(answerMessage);
 	    setTimeout(function(){
 	    	subscribeStomp.send("/BuyMyTime/callAnswer", {}, payload);  
-	    }, 2000);
+	    }, 1000);
 	});
 }
 
@@ -161,16 +168,28 @@ function peerCall(callingTo) {
           console.log(window.localStream);
           step3(peer.call(callingTo, window.localStream));
           step1();
-      }, 2000);
+          startCheckingConnection(callingTo);
+      }, 1000);
     });
     peer.on('call', function(call){
       call.answer(window.localStream);
       step3(call);
     });
     peer.on('error', function(err){
-      alert(err.message);
-      step2();
+    	if(err.type == "peer-unavailable"){
+    		handlePeerUnavailableError(callingFrom);
+		}else{
+		    alert(err.message);
+		    step2();
+		    console.log(err.type);
+		}
     });
+    
+}
+
+function handlePeerUnavailableError(username){
+	endCall(username);
+	callEndDialogHtml(username);
 }
 
 function rejectCallClick() {
@@ -292,13 +311,30 @@ function step3 (call) {
     $('#step3').show();
 }
 
+function startCheckingConnection(username) {
+	checkingConnection = setInterval(function(){
+		peer.connect(username, {});
+	}, 2000);
+}
+
+function startSendingTimeUpdate() {
+	console.log("TU WESZLO");
+	var timeUpdateMessage = {'username': "nobody"};
+	var payload = JSON.stringify(timeUpdateMessage);
+	timeUpdate = setInterval(function(){
+		subscribeStomp.send("/BuyMyTime/timeUpdate", {}, payload);
+		console.log("TRALALAL");
+	}, 15000);
+}
+
 function startClock() {
   	
 	var startTime = new Date();
+	$(".clock").innerHTML = "";
 	$(".clock").show();
       
     setInterval(function(){
-	
+    	
 		var currentTime = new Date().getTime() - startTime.getTime();
 		var timer = new Date();
 		timer.setTime(currentTime);
@@ -326,11 +362,16 @@ function showChat(username){
 }
 
 function endCall(callWith) {
+	clearInterval(timeUpdate);
+	clearInterval(checkingConnection);
 	removeCallOverlapHtml(callWith);
 	getEndCall(callWith);
 	getHome();
-	peer.destroy();
-	window.localStream.getVideoTracks()[0].stop();
+	if(peer != null)
+		peer.destroy();
+	if(window.localStream != undefined){
+		window.localStream.getVideoTracks()[0].stop();
+	}
 }
 
 function sendEndCallMessage(callWith){

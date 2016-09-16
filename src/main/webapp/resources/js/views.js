@@ -1,7 +1,7 @@
 function loadOverlapsHtml(usernames){
 	usernames.forEach(function(username){
-	$("#menu").append('<button id="callOverlap' + username + '" class="ui-button ui-widget ui-corner-all"' + 
-			' style="float:right;">' + username + '</button>');
+	$("#menu").append('<button class="pure-button-black" id="callOverlap' + username + 
+			'" style="float:right;">' + username + '</button>');
 	});
 	$(document).ready(function(){
 		usernames.forEach(function(username){
