@@ -10,4 +10,6 @@ import data.entities.Transaction;
 @Transactional
 public interface TransactionRepository extends JpaRepository<Transaction, Long>{
 	Transaction findByPeerConnectionId(Long peerConnectionId);
+	Transaction findByPayingAndEnded(String username, boolean ended);
+
 }

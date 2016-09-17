@@ -82,14 +82,16 @@ public class SessionListener implements HttpSessionListener{
 
 	private void summarizeTransaction(PeerConnection peerConnection) {
 		Transaction transaction = transactionRepository.findByPeerConnectionId(peerConnection.getId());
-		data.entities.User userPaying = userRepository.findByUsername(peerConnection.getPaying());
-		data.entities.User userReceiver = userRepository.findByUsername(peerConnection.getReceiver());
-		userPaying.setCoins(userPaying.getCoins() - transaction.getCoins());
-		userReceiver.setCoins(userReceiver.getCoins() + transaction.getCoins());
-		transaction.setEnded(true);
-		userRepository.save(userPaying);
-		userRepository.save(userReceiver);
-		transactionRepository.save(transaction);
+		if(!transaction.getEnded()){
+			data.entities.User userPaying = userRepository.findByUsername(peerConnection.getPaying());
+			data.entities.User userReceiver = userRepository.findByUsername(peerConnection.getReceiver());
+			userPaying.setCoins(userPaying.getCoins() - transaction.getCoins());
+			userReceiver.setCoins(userReceiver.getCoins() + transaction.getCoins());
+			transaction.setEnded(true);
+			userRepository.save(userPaying);
+			userRepository.save(userReceiver);
+			transactionRepository.save(transaction);
+		}
 	}
 
 	private void sendEnd(String username, String sendTo){

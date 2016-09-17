@@ -158,10 +158,14 @@ public class VideoCallController {
 		} else {
 			CommuniqueMessage communique = 
     				new CommuniqueMessage("You do not have enought coins to continue chat.");
+			communique.setAction("endPaid");
     		messaging.convertAndSendToUser(peerConnection.getPaying(), "/queue/communique", communique);
     		communique.setCommunique(peerConnection.getPaying() 
     				+ " do not have enought coins to continue chat.");
     		messaging.convertAndSendToUser(peerConnection.getReceiver(), "/queue/communique", communique);
+    		peerConnection.setEnded(true);
+			peerConnectionRepository.save(peerConnection);
+			summarizeTransaction(peerConnection);
 		}
 	}
 
@@ -180,6 +184,20 @@ public class VideoCallController {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private void summarizeTransaction(PeerConnection peerConnection) {
+		Transaction transaction = transactionRepository.findByPeerConnectionId(peerConnection.getId());
+		if(!transaction.getEnded()){
+			data.entities.User userPaying = userRepository.findByUsername(peerConnection.getPaying());
+			data.entities.User userReceiver = userRepository.findByUsername(peerConnection.getReceiver());
+			userPaying.setCoins(userPaying.getCoins() - transaction.getCoins());
+			userReceiver.setCoins(userReceiver.getCoins() + transaction.getCoins());
+			transaction.setEnded(true);
+			userRepository.save(userPaying);
+			userRepository.save(userReceiver);
+			transactionRepository.save(transaction);
+		}
 	}
     
 }

@@ -311,7 +311,7 @@ function chatContentHtml(username) {
 	h.push('<div class="right-panel">');
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
 	h.push('<h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
-	h.push('<div class="clock" style="display:none;"><\/div><div class="chatContent">');
+	h.push('<div id="clock" style="display:none;"><\/div><div class="chatContent">');
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button><\/p>');

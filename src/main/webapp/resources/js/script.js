@@ -31,6 +31,15 @@ function handleCommunique(communiqueMessage){
 	console.log("handleCOmmunique");
 	var message = JSON.parse(communiqueMessage.body);
 	communiqueDialogHtml(message.communique);
+	if(message.action != null)
+		makeAction(message.action);
+}
+
+function makeAction(action){
+	if (action == "endPaid"){
+		$("#clock").remove();
+		clearInterval(timeUpdate);
+	}
 }
 
 function handleCall(call){
@@ -340,8 +349,8 @@ function startSendingTimeUpdate() {
 function startClock() {
   	
 	var startTime = new Date();
-	$(".clock").innerHTML = "";
-	$(".clock").show();
+	$("#clock").innerHTML = "";
+	$("#clock").show();
       
     setInterval(function(){
     	
@@ -359,7 +368,7 @@ function startClock() {
 		
 		// Compose the string for display
 		var currentTimeString = hours + ":" + minutes + ":" + seconds;
-		$(".clock").html(currentTimeString);
+		$("#clock").html(currentTimeString);
 		
     },1000);
     

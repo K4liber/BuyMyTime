@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import repositories.CategoryRepository;
 import repositories.PeerConnectionRepository;
+import repositories.TransactionRepository;
+import repositories.UserRepository;
 import data.entities.Category;
 import data.entities.PeerConnection;
+import data.entities.Transaction;
 import data.entities.User;
 
 @RequestMapping
@@ -25,6 +28,10 @@ public class HomeController {
 	CategoryRepository categoryRepository;
 	@Autowired
 	private PeerConnectionRepository peerConnectionRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
+	@Autowired
+	private UserRepository userRepository;
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	public String home(Principal principal, Model model){
@@ -45,11 +52,13 @@ public class HomeController {
 		for(PeerConnection peerConnection : peerConnections){
             peerConnection.setEnded(true);
             peerConnectionRepository.save(peerConnection);
+            summarizeTransaction(peerConnection);
 		}
 		peerConnections = peerConnectionRepository
 				.findAllByReceiverAndEnded(username, false);
 		for(PeerConnection peerConnection : peerConnections){
             peerConnection.setEnded(true);
+            summarizeTransaction(peerConnection);
             peerConnectionRepository.save(peerConnection);
 		}
 	}
@@ -66,6 +75,20 @@ public class HomeController {
 	public String getAbout(@RequestParam String username, Model model){
 		String about = "COs tam sadasdasd" + username;
 		return about;
+	}
+	
+	private void summarizeTransaction(PeerConnection peerConnection) {
+		Transaction transaction = transactionRepository.findByPeerConnectionId(peerConnection.getId());
+		if(!transaction.getEnded()){
+			User userPaying = userRepository.findByUsername(peerConnection.getPaying());
+			User userReceiver = userRepository.findByUsername(peerConnection.getReceiver());
+			userPaying.setCoins(userPaying.getCoins() - transaction.getCoins());
+			userReceiver.setCoins(userReceiver.getCoins() + transaction.getCoins());
+			transaction.setEnded(true);
+			userRepository.save(userPaying);
+			userRepository.save(userReceiver);
+			transactionRepository.save(transaction);
+		}
 	}
 	
 }
