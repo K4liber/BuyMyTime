@@ -15,7 +15,7 @@ function loadStomp(){
 	subscribeStomp.connect('guest', 'guest', function(frame){
      	subscribeStomp.subscribe('/user/queue/call', handleCall);
      	subscribeStomp.subscribe('/user/queue/callAnswer', handleCallAnswer);
-     	subscribeStomp.subscribe('/user/queue/callEnd', handleCallEnd);
+     	subscribeStomp.subscribe('/user/queue/endCall', handleCallEnd);
      	subscribeStomp.subscribe('/user/queue/chat', handleChatMessage);
      	subscribeStomp.subscribe('/user/queue/paid', handlePaidMessage);
      	subscribeStomp.subscribe('/user/queue/paidAnswer', handlePaidAnswer);
@@ -47,11 +47,11 @@ function handleCancleCall(call){
 	});
 }
 
-function handleCallEnd(call){
+function handleCallEnd(endCallMessage){
 	console.log("handleCallEnd script.js");
-	var message = JSON.parse(call.body);
-	callEndDialogHtml(message.name);
-	endCall(message.name);
+	var endCallMessageBody = JSON.parse(endCallMessage.body);
+	endCallDialogHtml(endCallMessageBody);
+	endCall(endCallMessageBody.callWith);
 }
 
 function cancelCall(callTo){
@@ -185,7 +185,7 @@ function peerCall(callingTo) {
     });
     peer.on('error', function(err){
     	if(err.type == "peer-unavailable"){
-    		handlePeerUnavailableError(callingFrom);
+    		handlePeerUnavailableError(callingTo);
 		}else{
 		    alert(err.message);
 		    step2();
@@ -197,7 +197,11 @@ function peerCall(callingTo) {
 
 function handlePeerUnavailableError(username){
 	endCall(username);
-	callEndDialogHtml(username);
+	var endCallMessage = {
+			'callWith': username,
+			'communique': "peer unavailable error"
+	};
+	endCallDialogHtml(endCallMessage);
 }
 
 function rejectCallClick() {
@@ -381,10 +385,9 @@ function endCall(callWith) {
 }
 
 function sendEndCallMessage(callWith){
-	var callEndMessage = {'name': callWith};
-    var payload = JSON.stringify(callEndMessage);
-    console.log(payload);
-    subscribeStomp.send("/BuyMyTime/callEnd", {}, payload); 
+	var endCallMessage = {'callWith': callWith};
+    var payload = JSON.stringify(endCallMessage);
+    subscribeStomp.send("/BuyMyTime/endCall", {}, payload); 
 }
 
 function addCard(){

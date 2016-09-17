@@ -117,6 +117,7 @@ public class UserController {
 		if(bindingResult.hasErrors())
 			return "register";
 		
+		user.setCoins((long) 0);
 		user.setEnabled(true);
 		userRepository.save(user);
 		UserProfile userProfile = new UserProfile(user);

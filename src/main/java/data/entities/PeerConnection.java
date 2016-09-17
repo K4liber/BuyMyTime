@@ -1,5 +1,7 @@
 package data.entities;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -31,8 +33,10 @@ public class PeerConnection {
 		this.receiver = message.getReceiver();
 		this.price = message.getPrice();
 		this.maxTime = message.getMaxTime();
-		this.startPoint = (new Date()).toString();
-		this.endPoint = (new Date()).toString();
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = formatter.format(new Date());
+		this.startPoint = date;
+		this.endPoint = date;
 	}
 
 	public Long getId() {

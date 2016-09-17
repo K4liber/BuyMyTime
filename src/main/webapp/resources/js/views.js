@@ -408,9 +408,11 @@ function payingCallMessageDialogHtml(message){
 	
 }
 
-function callEndDialogHtml(callWith) {
+function endCallDialogHtml(endCallMessage) {
 	var h = [''];
-	h.push('<p>User ' + callWith + ' ended conversation with you.<\/p>');
+	h.push('<p>Conversation with ' + endCallMessage.callWith + ' is ended.<\/p>');
+	if(endCallMessage.communique != null)
+		h.push('<p>' + endCallMessage.communique + '<\/p>');
 	document.getElementById('dialog').innerHTML = h.join('');
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "End of conversation", closeOnEscape: true}).dialog("open");
