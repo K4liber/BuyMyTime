@@ -14,10 +14,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import data.entities.PeerConnection;
+import data.entities.User;
+import data.entities.UserProfile;
 import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
 import data.messages.CallMessage;
 import data.messages.ChatMessage;
+import data.messages.CommuniqueMessage;
 import data.messages.PaidMessage;
 import data.messages.TimeUpdateMessage;
 
@@ -26,6 +29,7 @@ import org.springframework.messaging.simp.annotation.*;
 
 import repositories.ChatMessageRepository;
 import repositories.PeerConnectionRepository;
+import repositories.UserProfileRepository;
 import repositories.UserRepository;
 
 @Controller
@@ -33,12 +37,12 @@ public class VideoCallController {
 	
 	@Autowired
 	private SimpMessagingTemplate messaging;
-	
 	@Autowired
 	private ChatMessageRepository chatMessageRepository;
-	
 	@Autowired
 	private PeerConnectionRepository peerConnectionRepository;
+	@Autowired
+	UserRepository userRepository;
 	
     @MessageMapping("/call")
     public void call(Principal principal, CallMessage message) throws InterruptedException{
@@ -74,11 +78,25 @@ public class VideoCallController {
     
     @MessageMapping("/paidCallAnswer")
     public void paidCallAnswer(Principal principal, AnswerPaidMessage message) throws InterruptedException{ 
-    	if(message.isAccept()){
+    	System.out.println("Tu weszlo.");
+    	boolean haveEnoughCoins = haveEnoughCoins(principal.getName(), message);
+    	if(message.isAccept() && haveEnoughCoins){
 			PeerConnection peerConnection = new PeerConnection(message);
     		peerConnectionRepository.save(peerConnection);
+    		messaging.convertAndSendToUser(message.getReceiver(), "/queue/paidAnswer", message);
+            messaging.convertAndSendToUser(message.getPaying(), "/queue/paidAnswer", message);
+    	} else if (message.isAccept() && !haveEnoughCoins) {
+    		System.out.println("Tu weszlo 2.");
+    		CommuniqueMessage communique = 
+    				new CommuniqueMessage("You do not have enought coins to start paid chat.");
+    		messaging.convertAndSendToUser(message.getPaying(), "/queue/communique", communique);
+    		communique.setCommunique(message.getPaying() 
+    				+ " do not have enought coins to start paid chat.");
+    		messaging.convertAndSendToUser(message.getReceiver(), "/queue/communique", communique);
+    	} else if (!message.isAccept()){
+	        messaging.convertAndSendToUser(message.getReceiver(), "/queue/paidAnswer", message);
+	        messaging.convertAndSendToUser(message.getPaying(), "/queue/paidAnswer", message);
     	}
-        messaging.convertAndSendToUser(message.getReceiver(), "/queue/paidAnswer", message);
     }
     
     @MessageMapping("/message")
@@ -106,6 +124,17 @@ public class VideoCallController {
     		peerConnection.setEndPoint((new Date()).toString());
     		peerConnectionRepository.save(peerConnection);
     	}
+    }
+    
+    public boolean haveEnoughCoins(String username, AnswerPaidMessage message){
+    	System.out.println("TUTAJAJAJ");
+    	User payingUser = userRepository.findByUsername(username);
+    	Long coins = payingUser.getCoins();
+    	Long enoughtToStart = (Long)(Long.parseLong(message.getPrice())/60);
+    	if (coins != null)
+    		return (coins > enoughtToStart);
+    	else
+    		return false;
     }
     
 }

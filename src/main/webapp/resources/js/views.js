@@ -12,6 +12,15 @@ function loadOverlapsHtml(usernames){
 	});
 }
 
+function communiqueDialogHtml(communique){
+	var h = [''];
+	h.push('<p>' + communique + '<\/p>');
+	document.getElementById('dialog').innerHTML = h.join('');
+	$(document).ready(function() {
+		$("#dialog").dialog({title: "Communique", closeOnEscape: true });
+		$("#dialog").dialog("open");
+	});
+}
 
 function removeCallOverlapHtml(username){
 	console.log("removing");
@@ -410,12 +419,14 @@ function callEndDialogHtml(callWith) {
 
 function acceptPaidAnswerDialogHtml(message){
 	var h = [''];
-	console.log('acceptPaidAnswerDialogHtml: ' + message);
-	h.push('<p>User ' + message.receiver + ' accept the terms of chat.<\/p>');
+	h.push('<p>Receiver:  ' + message.receiver + '<\/p>');
+	h.push('<p>Paying:  ' + message.paying + '<\/p>');
+	h.push('<p>Price:  ' + message.price + '<\/p>');
+	h.push('<p>Max time:  ' + message.maxTime + '<\/p>');
 	h.push('<div><button id="ok" class="pure-button pure-button-success">OK<\/button><\/div>');
 	document.getElementById('dialog').innerHTML = h.join('');
 	$(document).ready(function() {
-		$("#dialog").dialog({title: "Acceptation" , closeOnEscape: true }).dialog("open");
+		$("#dialog").dialog({title: "Terms of chat" , closeOnEscape: true }).dialog("open");
 		$("#ok").click( function (){
 			$("#dialog").dialog("close");
 	    });

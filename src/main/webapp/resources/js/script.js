@@ -19,11 +19,18 @@ function loadStomp(){
      	subscribeStomp.subscribe('/user/queue/chat', handleChatMessage);
      	subscribeStomp.subscribe('/user/queue/paid', handlePaidMessage);
      	subscribeStomp.subscribe('/user/queue/paidAnswer', handlePaidAnswer);
+     	subscribeStomp.subscribe('/user/queue/communique', handleCommunique);
     });
 }
 
 function login(){
 	loadStomp();
+}
+
+function handleCommunique(communiqueMessage){
+	console.log("handleCOmmunique");
+	var message = JSON.parse(communiqueMessage.body);
+	communiqueDialogHtml(message.communique);
 }
 
 function handleCall(call){
@@ -78,6 +85,7 @@ function handlePaidMessage(paidMessage){
 }
 
 function handlePaidAnswer(message){
+	console.log("Tu tez weszlo.");
 	var messageBody = JSON.parse(message.body);
 	if(messageBody.accept){
 		acceptPaidAnswerDialogHtml(messageBody);
@@ -222,8 +230,6 @@ function sendPaidAnswer(toId, fromId, price, maxTime, accept){
 	var answerMessage = {'paying': toId, 'receiver': fromId, 'price': price, 'maxTime': maxTime, 'accept': accept};
     var payload = JSON.stringify(answerMessage);
     subscribeStomp.send("/BuyMyTime/paidCallAnswer", {}, payload);
-    if(accept)
-    	startClock();
 }
 
 function editProfile(userProfile){
