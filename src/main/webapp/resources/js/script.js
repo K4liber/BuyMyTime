@@ -95,9 +95,34 @@ function handleCallAnswer(callAnswer){
 function handleChatMessage(chatMessage){
 	console.log("handleChatMessage script.js");
 	var message = JSON.parse(chatMessage.body);
-	$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
-	$("#chatMessagesList").append('<div style="color:green;">' + message.messageContent + '</div>').scrollTop("0");
+	$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>');
+	if(chatMessage.type == "file"){
+		$("#chatMessagesList")
+			.append('<div style="color:green;"><span id="messageFile" class="messageFile">' 
+					+ message.messageContent + '</span></div>');
+		$(document).ready(function(){
+			$("#messageFile").click(function(){
+				getFileName(function(fileName) {
+					downloadURI("resources/files/" + fileName, message.messageContent);
+				}, message.id);
+			});
+		});
+	} else {
+		$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>');
+		$("#chatMessagesList")
+		.append('<div style="color:green;">' + message.messageContent + '</div>');
+	}
 }
+
+function downloadURI(uri, name) {
+	  var link = document.createElement("a");
+	  link.download = name;
+	  link.href = uri;
+	  document.body.appendChild(link);
+	  link.click();
+	  document.body.removeChild(link);
+	  delete link;
+	}
 
 function handlePaidMessage(paidMessage){
 	var message = JSON.parse(paidMessage.body);
@@ -364,12 +389,17 @@ function showChat(username){
 	$("#contents").hide();
 }
 
+function showContents(){
+	$("#chatContents").hide();
+	$("#contents").show();
+}
+
 function endCall(callWith) {
 	clearInterval(timeUpdate);
 	clearInterval(checkingConnection);
 	removeCallOverlapHtml(callWith);
 	getEndCall(callWith);
-	getHome();
+	showContents();
 	if(peer != null)
 		peer.destroy();
 	if(window.localStream != undefined){

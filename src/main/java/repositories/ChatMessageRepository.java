@@ -12,4 +12,6 @@ import data.messages.ChatMessage;
 @Transactional
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>{
 	List<ChatMessage> findAllBySendFromAndSendTo(String sendFrom, String sendTo);
+	ChatMessage findByDateTimeAndSendTo(String date, String sendTo);
+	ChatMessage findById(Long id);
 }

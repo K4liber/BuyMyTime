@@ -120,13 +120,9 @@ public class ProfileController {
 	@RequestMapping(value="/edit", method=RequestMethod.POST)
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
         Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
-		System.out.println(file.getOriginalFilename());
 		String realPathtoUploads = request.getSession().getServletContext().getRealPath("/resources/img");
-		System.out.println(realPathtoUploads);
         if(! new File(realPathtoUploads).exists())
-        {
             new File(realPathtoUploads).mkdir();
-        }
         String fileName = principal.getName() + "." + file.getContentType().split("/")[1];
         String filePath = realPathtoUploads + "\\" + fileName;
         File dest = new File(filePath);

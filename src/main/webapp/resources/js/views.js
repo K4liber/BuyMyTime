@@ -307,16 +307,20 @@ function callDialogHtml(userCalling){
 
 function chatContentHtml(username) {
 	var h = [''];
-	h.push('<div class="left-panel"><video id="their-video" autoplay><\/video><\/div>');
+	h.push('<div class="left-panel"><h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
+	h.push('<video id="their-video" autoplay><\/video><\/div>');
 	h.push('<div class="right-panel">');
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
-	h.push('<h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
+	h.push('<form id="sendFile" method="post" enctype="multipart/form-data" >');
+	h.push('<input name="username" type="text" value="' + username + '" style="display:none;" readonly>');
 	h.push('<div id="clock" style="display:none;"><\/div>');
 	h.push('<button class="pure-button pure-button-success" id="endPaid" style="display:none;">End paid chat<\/button>');
 	h.push('<div class="chatContent">');
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
-	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button><\/p>');
+	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button>');
+	h.push('<input type="file" name="file" required id="upload">');
+	h.push('<input type="submit" value="Send file" /><\/p>');
 	h.push('<div id="step3">');
 	h.push('<p><button class="pure-button pure-button-error" id="endCall">End call<\/button><\/p>');
 	h.push('<p><button class="pure-button pure-button-success" id="startPaying">Paying conversation<\/button><\/p>');
@@ -341,6 +345,11 @@ function chatContentHtml(username) {
 		$("#endPaid").click(function() {
 			endPaidCall();
 			sendEndPaidMessage(document.getElementById('chatWith').innerHTML);
+		});
+		$("#sendFile").submit(function(e){
+		    e.preventDefault();
+			var formdata = new FormData(this);
+			postFileMessage(formdata);
 		});
 	});
 }

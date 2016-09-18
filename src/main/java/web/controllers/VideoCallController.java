@@ -1,5 +1,7 @@
 package web.controllers;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.Format;
@@ -18,9 +20,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import data.entities.PeerConnection;
 import data.entities.Transaction;
@@ -57,6 +61,32 @@ public class VideoCallController {
 	private UserRepository userRepository;
 	@Autowired
 	private TransactionRepository transactionRepository;
+	
+	@RequestMapping(value="/fileMessage", method=RequestMethod.POST)
+	public String handleFileMessage(@RequestParam("file") MultipartFile file, @RequestParam("username") String sendTo,
+        Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
+		ChatMessage message = new ChatMessage();
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = formatter.format(new Date());
+        String realPathtoUploads = request.getSession().getServletContext().getRealPath("/resources/files");
+        if(! new File(realPathtoUploads).exists())
+            new File(realPathtoUploads).mkdir();
+		message.setMessageContent(file.getOriginalFilename());
+		message.setSendTo(sendTo);
+		message.setSendFrom(principal.getName());
+		message.setType("file");
+		message.setDateTime(date);
+		chatMessageRepository.save(message);
+		ChatMessage chatMessage = chatMessageRepository.findByDateTimeAndSendTo(date, sendTo);
+		String fileName = principal.getName() + sendTo + chatMessage.getId() + "." + file.getContentType().split("/")[1];
+        String filePath = realPathtoUploads + "\\" + fileName;
+        File dest = new File(filePath);
+        file.transferTo(dest);
+        chatMessage.setFileName(fileName);
+		messaging.convertAndSendToUser(sendTo, "/queue/chat", chatMessage);
+        chatMessageRepository.save(chatMessage);
+		return "home";
+	}
 	
     @MessageMapping("/call")
     public void call(Principal principal, CallMessage message) throws InterruptedException{   
@@ -113,12 +143,13 @@ public class VideoCallController {
     }
     
     @MessageMapping("/message")
-    public void chatMessage(Principal principal, ChatMessage message) throws InterruptedException{
-        messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", message);
+    public void chatMessage(Principal principal, ChatMessage message) throws InterruptedException{ 
         Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = formatter.format(new Date());
         message.setDateTime(date);
         chatMessageRepository.save(message);
+        ChatMessage chatMessage = chatMessageRepository.findByDateTimeAndSendTo(date, message.getSendTo());
+        messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", chatMessage);
     }
     
     @MessageMapping("/timeUpdate")
@@ -177,6 +208,17 @@ public class VideoCallController {
 		}
 		return null;
 	}
+    
+    @RequestMapping(value="/fileName/{id}", method=RequestMethod.GET)
+	@ResponseBody
+	public String getFileName(Principal principal, Model model, HttpSession session, 
+			@PathVariable("id") Long id){
+    	ChatMessage chatMessage = chatMessageRepository.findById(id);
+    	if(chatMessage != null)
+    		return chatMessage.getFileName();
+    	else
+    		return null;
+    }
 
 	private boolean haveEnoughCoins(String username, PeerConnection peerConnection, Transaction transaction) {
     	User payingUser = userRepository.findByUsername(username);

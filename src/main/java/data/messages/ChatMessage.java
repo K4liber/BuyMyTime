@@ -16,6 +16,8 @@ public class ChatMessage {
 	private String sendTo;
 	private String messageContent;
 	private String dateTime;
+	private String type;
+	private String fileName;
 	
 	@NotNull
 	private boolean open;
@@ -66,6 +68,22 @@ public class ChatMessage {
 
 	public void setOpen(boolean open) {
 		this.open = open;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 }

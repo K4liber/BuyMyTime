@@ -8,11 +8,28 @@ function getEndCall(username){
     });
 }
 
-function postProfileImage(formdata){
+function postProfileImage(formData){
 	$.ajax({
         url: "edit",
         type: "POST",
-        data: formdata,
+        data: formData,
+        mimeTypes:"multipart/form-data",
+        contentType: false,
+        cache: false,
+        processData: false,
+        success: function(){
+            alert("file successfully submitted");
+        },error: function(){
+            alert("okey");
+        }
+	});
+}
+
+function postFileMessage(formData){
+	$.ajax({
+        url: "fileMessage",
+        type: "POST",
+        data: formData,
         mimeTypes:"multipart/form-data",
         contentType: false,
         cache: false,
@@ -189,6 +206,17 @@ function getUsername(onSuccess) {
 	$.ajax({
         type : "GET",
         url : "username",
+        success: function(data){
+        	if(data != "err")
+        		onSuccess(data);
+        }
+    });
+}
+
+function getFileName(onSuccess, id){
+	$.ajax({
+        type : "GET",
+        url : "fileName/" + id,
         success: function(data){
         	if(data != "err")
         		onSuccess(data);
