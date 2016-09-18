@@ -311,7 +311,9 @@ function chatContentHtml(username) {
 	h.push('<div class="right-panel">');
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
 	h.push('<h2>Chat with <span id="chatWith">' + username + '</span><\/h2>');
-	h.push('<div id="clock" style="display:none;"><\/div><div class="chatContent">');
+	h.push('<div id="clock" style="display:none;"><\/div>');
+	h.push('<button class="pure-button pure-button-success" id="endPaid" style="display:none;">End paid chat<\/button>');
+	h.push('<div class="chatContent">');
 	h.push('<div id="chatMessagesList"><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button><\/p>');
@@ -335,6 +337,10 @@ function chatContentHtml(username) {
 		});
 		$("#startPaying").click(function() {
 			payingCallDialogHtml(document.getElementById('chatWith').innerHTML);
+		});
+		$("#endPaid").click(function() {
+			endPaidCall();
+			sendEndPaidMessage(document.getElementById('chatWith').innerHTML);
 		});
 	});
 }
@@ -456,4 +462,33 @@ function rejectCallHtml(username) {
 	$(document).ready(function() {
 		$("#dialog").dialog({title: "Rejected call", closeOnEscape: true}).dialog("open");
 	});
+}
+
+function startPaidHtml() {
+  	
+	var startTime = new Date();
+	$("#clock").innerHTML = "";
+	$("#clock").show();
+	$("#endPaid").show();
+      
+    setInterval(function(){
+    	
+		var currentTime = new Date().getTime() - startTime.getTime();
+		var timer = new Date();
+		timer.setTime(currentTime);
+		var hours = timer.getHours() - 1;
+		var minutes = timer.getMinutes();
+		var seconds = timer.getSeconds();
+		
+		// Add leading zeros
+		minutes = (minutes < 10 ? "0" : "") + minutes;
+		seconds = (seconds < 10 ? "0" : "") + seconds;
+		hours = (hours < 10 ? "0" : "") + hours;
+		
+		// Compose the string for display
+		var currentTimeString = hours + ":" + minutes + ":" + seconds;
+		$("#clock").html(currentTimeString);
+		
+    },1000);
+    
 }

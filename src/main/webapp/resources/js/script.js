@@ -37,9 +37,20 @@ function handleCommunique(communiqueMessage){
 
 function makeAction(action){
 	if (action == "endPaid"){
-		$("#clock").remove();
-		clearInterval(timeUpdate);
+		endPaidCall();
 	}
+}
+
+function sendEndPaidMessage(callWith){
+	var endCallMessage = {'callWith': callWith};
+    var payload = JSON.stringify(endCallMessage);
+    subscribeStomp.send("/BuyMyTime/endPaid", {}, payload); 
+}
+
+function endPaidCall(){
+	$("#clock").remove();
+	$("#endPaid").remove();
+	clearInterval(timeUpdate);
 }
 
 function handleCall(call){
@@ -94,11 +105,10 @@ function handlePaidMessage(paidMessage){
 }
 
 function handlePaidAnswer(message){
-	console.log("Tu tez weszlo.");
 	var messageBody = JSON.parse(message.body);
 	if(messageBody.accept){
 		acceptPaidAnswerDialogHtml(messageBody);
-	    startClock();
+	    startPaidHtml();
 	    startSendingTimeUpdate();
 	} else {
 		declinePaidAnswerDialogHtml(messageBody);
@@ -346,33 +356,7 @@ function startSendingTimeUpdate() {
 	}, 15000);
 }
 
-function startClock() {
-  	
-	var startTime = new Date();
-	$("#clock").innerHTML = "";
-	$("#clock").show();
-      
-    setInterval(function(){
-    	
-		var currentTime = new Date().getTime() - startTime.getTime();
-		var timer = new Date();
-		timer.setTime(currentTime);
-		var hours = timer.getHours() - 1;
-		var minutes = timer.getMinutes();
-		var seconds = timer.getSeconds();
-		
-		// Add leading zeros
-		minutes = (minutes < 10 ? "0" : "") + minutes;
-		seconds = (seconds < 10 ? "0" : "") + seconds;
-		hours = (hours < 10 ? "0" : "") + hours;
-		
-		// Compose the string for display
-		var currentTimeString = hours + ":" + minutes + ":" + seconds;
-		$("#clock").html(currentTimeString);
-		
-    },1000);
-    
-}
+
 
 function showChat(username){
 	console.log(username);

@@ -14,6 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -133,6 +138,45 @@ public class VideoCallController {
         	}
     	}
     }
+    
+    @MessageMapping("/endPaid")
+    public void endPaid(Principal principal, EndCallMessage message) throws InterruptedException{
+    	String username = principal.getName();
+		PeerConnection peerConnection = peerConnectionRepository
+				.findByPayingAndEnded(username, false);
+		if(peerConnection == null){
+			peerConnection = peerConnectionRepository
+				.findByReceiverAndEnded(username, false);
+		}
+		if(peerConnection != null){
+			peerConnection.setEnded(true);
+			peerConnectionRepository.save(peerConnection);
+			summarizeTransaction(peerConnection);
+			CommuniqueMessage communique = 
+    				new CommuniqueMessage(username + " ended paid conversation.");
+			communique.setAction("endPaid");
+    		messaging.convertAndSendToUser(message.getCallWith(), "/queue/communique", communique);
+		}
+    }
+    
+    @RequestMapping(value="/endCall/{callWith}", method=RequestMethod.GET)
+	@ResponseBody
+	public String endCall(Principal principal, Model model, HttpSession session, 
+			@PathVariable("callWith") String callWith){
+		String username = principal.getName();
+		PeerConnection peerConnection = peerConnectionRepository
+				.findByPayingAndEnded(username, false);
+		if(peerConnection == null){
+			peerConnection = peerConnectionRepository
+				.findByReceiverAndEnded(username, false);
+		}
+		if(peerConnection != null){
+			peerConnection.setEnded(true);
+			peerConnectionRepository.save(peerConnection);
+			summarizeTransaction(peerConnection);
+		}
+		return null;
+	}
 
 	private boolean haveEnoughCoins(String username, PeerConnection peerConnection, Transaction transaction) {
     	User payingUser = userRepository.findByUsername(username);

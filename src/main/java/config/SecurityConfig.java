@@ -1,7 +1,5 @@
 package config;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 @Configuration
@@ -37,7 +28,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(HttpMethod.GET, "/newcard").authenticated()
 			.anyRequest().permitAll().and().formLogin();
 		http.csrf().disable();
-		http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
+		http.sessionManagement()
+			.maximumSessions(100)
+			.maxSessionsPreventsLogin(false)   
+			.sessionRegistry(sessionRegistry());
 		
 	}
 	
