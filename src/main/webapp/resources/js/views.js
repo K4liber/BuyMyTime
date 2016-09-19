@@ -127,7 +127,7 @@ function contactHtml(userContact) {
 	var h = [''];
 	h.push('<div><h2><span id="contactUsername">' + userContact.profile.username +'<\/span><\/h2><\/div>');
 	h.push('<div class="messagesContent">');
-	h.push('<div id="messagesList">');
+	h.push('<div id="messagesList' + userContact.profile.username  + '">');
 	userContact.userMessages.forEach(function(userMessage){
 		if(userMessage.mine)
 			h.push('<div>' + userMessage.message + '<\/div>');
@@ -311,16 +311,17 @@ function chatContentHtml(username) {
 	h.push('<video id="their-video" autoplay><\/video><\/div>');
 	h.push('<div class="right-panel">');
 	h.push('<video id="my-video" autoplay="true" muted="true"><\/video>');
-	h.push('<form id="sendFile" method="post" enctype="multipart/form-data" >');
-	h.push('<input name="username" type="text" value="' + username + '" style="display:none;" readonly>');
 	h.push('<div id="clock" style="display:none;"><\/div>');
 	h.push('<button class="pure-button pure-button-success" id="endPaid" style="display:none;">End paid chat<\/button>');
 	h.push('<div class="chatContent">');
-	h.push('<div id="chatMessagesList"><\/div><\/div>');
+	h.push('<div id="chatMessagesList" class="chatMessagesList" ><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button>');
+	h.push('<form id="sendFile" method="post" enctype="multipart/form-data" >');
+	h.push('<input name="username" type="text" value="' + username + '" style="display:none;" readonly>');
 	h.push('<input type="file" name="file" required id="upload">');
 	h.push('<input type="submit" value="Send file" /><\/p>');
+	h.push('</form>');
 	h.push('<div id="step3">');
 	h.push('<p><button class="pure-button pure-button-error" id="endCall">End call<\/button><\/p>');
 	h.push('<p><button class="pure-button pure-button-success" id="startPaying">Paying conversation<\/button><\/p>');
@@ -349,7 +350,13 @@ function chatContentHtml(username) {
 		$("#sendFile").submit(function(e){
 		    e.preventDefault();
 			var formdata = new FormData(this);
-			postFileMessage(formdata);
+			postFileMessage(formdata, function(fileName){
+			    $("#chatMessagesList")
+				.append('<div><span onClick="downloadFile(\'' 
+						+ fileName + '\', \'' + $('#upload').val() + '\')" id="' 
+						+ $('#upload').val() + '" class="messageFile">' 
+						+ $('#upload').val() + '</span></div>');
+			});
 		});
 	});
 }

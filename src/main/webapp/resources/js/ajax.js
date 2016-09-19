@@ -25,7 +25,7 @@ function postProfileImage(formData){
 	});
 }
 
-function postFileMessage(formData){
+function postFileMessage(formData, onSuccess){
 	$.ajax({
         url: "fileMessage",
         type: "POST",
@@ -34,8 +34,8 @@ function postFileMessage(formData){
         contentType: false,
         cache: false,
         processData: false,
-        success: function(){
-            alert("file successfully submitted");
+        success: function(fileName){
+        	onSuccess(fileName);
         },error: function(){
             alert("okey");
         }

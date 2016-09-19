@@ -63,6 +63,7 @@ public class VideoCallController {
 	private TransactionRepository transactionRepository;
 	
 	@RequestMapping(value="/fileMessage", method=RequestMethod.POST)
+	@ResponseBody
 	public String handleFileMessage(@RequestParam("file") MultipartFile file, @RequestParam("username") String sendTo,
         Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
 		ChatMessage message = new ChatMessage();
@@ -85,7 +86,7 @@ public class VideoCallController {
         chatMessage.setFileName(fileName);
 		messaging.convertAndSendToUser(sendTo, "/queue/chat", chatMessage);
         chatMessageRepository.save(chatMessage);
-		return "home";
+		return fileName;
 	}
 	
     @MessageMapping("/call")

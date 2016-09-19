@@ -92,23 +92,29 @@ function handleCallAnswer(callAnswer){
 	}
 }
 
+function downloadFile(fileName, name){
+	downloadURI("resources/files/" + fileName, name);
+};
+
 function handleChatMessage(chatMessage){
 	console.log("handleChatMessage script.js");
 	var message = JSON.parse(chatMessage.body);
-	$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>');
-	if(chatMessage.type == "file"){
+	if(message.type == "file"){
+		$("#messagesList" + message.sendFrom)
+			.append('<div style="color:green;"><span id="messageFile' + message.id + '" class="messageFile">' 
+				+ message.messageContent + '</span></div>');
 		$("#chatMessagesList")
-			.append('<div style="color:green;"><span id="messageFile" class="messageFile">' 
+			.append('<div style="color:green;"><span id="messageFile' + message.id + '" class="messageFile">' 
 					+ message.messageContent + '</span></div>');
 		$(document).ready(function(){
-			$("#messageFile").click(function(){
+			$("#messageFile" + message.id).click(function(){
 				getFileName(function(fileName) {
 					downloadURI("resources/files/" + fileName, message.messageContent);
 				}, message.id);
 			});
 		});
 	} else {
-		$("#messagesList").append('<div style="color:green;">' + message.messageContent + '</div>');
+		$("#messagesList" + message.sendFrom).append('<div style="color:green;">' + message.messageContent + '</div>');
 		$("#chatMessagesList")
 		.append('<div style="color:green;">' + message.messageContent + '</div>');
 	}
@@ -164,7 +170,7 @@ function answerCall(callingFrom){
     );
 	console.log("answerCall script.js");
 	var yourId = document.getElementById("userNick").innerText;
-	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
+	peer = new Peer(yourId, {host: '192.168.0.11', port: 9000, path: '/BuyMyTime'});
 	peer.on('open', function(){
       $('#my-id').text(peer.id);
       step1();
@@ -213,7 +219,7 @@ function peerCall(callingTo) {
 	chatContentHtml(callingTo);
 	console.log("peerCall script.js");
 	var yourId = document.getElementById("userNick").innerText;
-	peer = new Peer(yourId, {host: '192.168.1.19', port: 9000, path: '/BuyMyTime'});
+	peer = new Peer(yourId, {host: '192.168.0.11', port: 9000, path: '/BuyMyTime'});
     peer.on('open', function(){
       $('#my-id').text(peer.id);
       setTimeout(function(){
@@ -287,8 +293,8 @@ function editProfile(userProfile){
 function sendChatMessage(sendTo, messageContent){
 	console.log(sendTo);
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("-1000");
-	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("-1000");
+	$("#messagesList" + sendTo).append('<div>' + messageContent + '</div>');
+	$("#chatMessagesList").append('<div>' + messageContent + '</div>');
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
     subscribeStomp.send("/BuyMyTime/message", {}, payload);	
@@ -297,7 +303,7 @@ function sendChatMessage(sendTo, messageContent){
 function sendMessage(sendTo){
 	var messageContent = $('#messageContent').val();
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	$("#messagesList" + sendTo).append('<div>' + messageContent + '</div>').scrollTop("0");
 	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
@@ -309,7 +315,7 @@ $(function(){
   	  var messageContent = $('#messageContent').val();
   	  var sendFrom = document.getElementById("yourid").innerText;
   	  var sendTo = document.getElementById("id").innerText;
-  	  $("#messagesList").append('<li>' + messageContent + '</li>');
+  	  $("#messagesList" + sendTo).append('<li>' + messageContent + '</li>');
   	  var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
       var payload = JSON.stringify(chatMessage);
       subscribeStomp.send("/BuyMyTime/message", {}, payload);
