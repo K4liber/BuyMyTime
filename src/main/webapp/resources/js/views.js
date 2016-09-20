@@ -147,23 +147,55 @@ function contactHtml(userContact) {
 	h.push('<div><h2><span id="contactUsername">' + userContact.profile.username +'<\/span><\/h2><\/div>');
 	h.push('<div class="messagesContent">');
 	h.push('<div id="messagesList' + userContact.profile.username  + '">');
-	userContact.userMessages.forEach(function(userMessage){
-		if(userMessage.mine)
-			h.push('<div>' + userMessage.message + '<\/div>');
-		else
-			h.push('<div style="color:green;">' + userMessage.message + '<\/div>');
+	userContact.chatMessages.forEach(function(chatMessage){
+		if (chatMessage.sendTo == userContact.profile.username){
+			if (chatMessage.type == "file"){
+				h.push('<div style="color:blue;" class="chatMessage"><span id="messageFile' + chatMessage.id 
+						+ '" class="messageFile">' + chatMessage.messageContent + '</span></div>');
+			} else 
+				h.push('<div style="color:green;">' + chatMessage.messageContent + '<\/div>');
+		} else {
+			if (chatMessage.type == "file"){
+				h.push('<div style="color:blue;" class="chatMessage"><span id="messageFile' + chatMessage.id 
+						+ '" class="messageFile">' + chatMessage.messageContent + '</span></div>');
+			} else
+				h.push('<div>' + chatMessage.messageContent + '<\/div>');
+		}
 	});
 	h.push('<\/div>');
 	h.push('<\/div>');
 	h.push('<textarea rows="2" cols="30" id="messageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="contactSendButton">Send<\/button><\/p>');
+	h.push('<form id="sendFileContact" method="post" enctype="multipart/form-data" >');
+	h.push('<input name="username" type="text" value="' + userContact.profile.username + '" style="display:none;" readonly>');
+	h.push('<input type="file" name="file" required id="upload">');
+	h.push('<input type="submit" value="Send file" /><\/p>');
+	h.push('</form>');
 	document.getElementById('contactsRightPanel').innerHTML = h.join('');
 	$(document).ready(function() {
+		userContact.chatMessages.forEach(function(chatMessage){
+			$("#messageFile" + chatMessage.id).click(function(){
+				getFileName(function(fileName) {
+					downloadURI("resources/files/" + fileName, chatMessage.messageContent);
+				}, chatMessage.id);
+			});
+		});
 		$("#contactSendButton").click(function(){
 			sendMessage(userContact.profile.username);
 			$("textarea#messageContent").val("");
 	    	$("textarea#messageContent").focus();
 	    });
+		$("#sendFileContact").submit(function(e){
+		    e.preventDefault();
+			var formdata = new FormData(this);
+			postFileMessage(formdata, function(fileName){
+			    $("#messagesList" + userContact.profile.username)
+				.append('<div class="chatMessage"><span onClick="downloadFile(\'' 
+						+ fileName + '\', \'' + $('#upload').val() + '\')" id="' 
+						+ $('#upload').val() + '" class="messageFile">' 
+						+ $('#upload').val() + '</span></div>');
+			});
+		});
 	});
 }
 
@@ -202,7 +234,7 @@ function categoryProfileHtml(userProfile){
 	}
 	if(userProfile.username != document.getElementById('userNick').innerHTML){
 		h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
-		h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
+		h.push('<button id="sendMessageCards" class="pure-button pure-button-warning">Send message<\/button>');
 	}else{
 		h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
 		h.push('<button id="addCard" class="pure-button">Add card<\/button>');
@@ -213,8 +245,9 @@ function categoryProfileHtml(userProfile){
 			$("#call").click(function(){
 				call(userProfile.username);
 		    });
-			$("#addContact").click(function(){
-				addContact(userProfile.username);
+			$("#sendMessageCards").click(function(){
+				getMessages();
+				getContact(userProfile.username);
 		    });
 		}else{
 			$("#edit").click(function(){
@@ -246,7 +279,7 @@ function profileHtml(userProfile) {
 	}
 	if(userProfile.username != document.getElementById('userNick').innerHTML){
 		h.push('<button id="call" class="pure-button pure-button-success">Call<\/button>');
-		h.push('<button id="addContact" class="pure-button pure-button-warning">Add to Contacts<\/button>');
+		h.push('<button id="sendMessageProfile" class="pure-button pure-button-warning">Send message<\/button>');
 	}else{
 		h.push('<button id="edit" class="pure-button">Edit profile<\/button>');
 		h.push('<button id="addCard" class="pure-button">Add card<\/button>');
@@ -257,8 +290,9 @@ function profileHtml(userProfile) {
 			$("#call").click(function(){
 				call(userProfile.username);
 		    });
-			$("#addContact").click(function(){
-				addContact(userProfile.username);
+			$("#sendMessageProfile").click(function(){
+				getMessages();
+				getContact(userProfile.username);
 		    });
 		}else{
 			$("#edit").click(function(){
@@ -332,7 +366,7 @@ function chatContentHtml(username) {
 	h.push('<div id="clock" style="display:none;"><\/div>');
 	h.push('<button class="pure-button pure-button-success" id="endPaid" style="display:none;">End paid chat<\/button>');
 	h.push('<div class="chatContent">');
-	h.push('<div id="chatMessagesList" class="chatMessagesList" ><\/div><\/div>');
+	h.push('<div id="chatMessagesList' + username + '" class="chatMessagesList" ><\/div><\/div>');
 	h.push('<textarea rows="2" cols="30" id="chatMessageContent"><\/textarea>');
 	h.push('<p><button class="pure-button" id="chatSendButton">Send<\/button>');
 	h.push('<form id="sendFile" method="post" enctype="multipart/form-data" >');
@@ -369,7 +403,12 @@ function chatContentHtml(username) {
 		    e.preventDefault();
 			var formdata = new FormData(this);
 			postFileMessage(formdata, function(fileName){
-			    $("#chatMessagesList")
+			    $("#chatMessagesList" + username)
+				.append('<div class="chatMessage"><span onClick="downloadFile(\'' 
+						+ fileName + '\', \'' + $('#upload').val() + '\')" id="' 
+						+ $('#upload').val() + '" class="messageFile">' 
+						+ $('#upload').val() + '</span></div>');
+			    $("#messagesList" + username)
 				.append('<div class="chatMessage"><span onClick="downloadFile(\'' 
 						+ fileName + '\', \'' + $('#upload').val() + '\')" id="' 
 						+ $('#upload').val() + '" class="messageFile">' 

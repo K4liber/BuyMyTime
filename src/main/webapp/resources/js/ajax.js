@@ -148,20 +148,6 @@ function getMessages(){
     });
 }
 
-function addContact(contactUsername){
-	$.ajax({
-        type : "GET",
-        url : "addContact/" + contactUsername,
-        success: function(data){
-        	if(data == "success"){
-        		successContactDialogAddHtml(contactUsername);
-        	}else if(data == "exist"){
-        		existContactDialogHtml(contactUsername);
-        	}
-        }
-    });
-}
-
 function categoryProfile(username){
 	$.ajax({
         type : "GET",

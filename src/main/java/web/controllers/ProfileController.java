@@ -33,7 +33,6 @@ import data.entities.UserProfile;
 import data.messages.ChatMessage;
 import data.views.ContactInfo;
 import data.views.UserContact;
-import data.views.UserMessage;
 
 @Controller
 public class ProfileController {
@@ -110,30 +109,9 @@ public class ProfileController {
 		userProfile.setStatus(isOnline(contactUsername));
 		List<ChatMessage> chatMessagesSended = chatMessageRepository.findAllBySendFromAndSendTo(username, contactUsername);
 		List<ChatMessage> chatMessagesReceived = chatMessageRepository.findAllBySendFromAndSendTo(contactUsername, username);
-		List<UserMessage> userMessages = groupingMessages(chatMessagesSended, chatMessagesReceived, username);
+		List<ChatMessage> userMessages = groupingMessages(chatMessagesSended, chatMessagesReceived, username);
 		UserContact userContact = new UserContact(userProfile, userMessages);
 		return userContact;
-	}
-	
-	@RequestMapping(value="/addContact/{contactUsername}", method=RequestMethod.GET)
-	@ResponseBody
-	public String addContact(Principal principal,
-			@PathVariable("contactUsername") String contactUsername, Model model){
-		String username = principal.getName();
-		Contact exist = contactRepository.findByUsernameAndContactUsername(username, contactUsername);
-		Contact exist2 = contactRepository.findByUsernameAndContactUsername(contactUsername, username);
-		boolean contactExist = (exist != null) || (exist2 != null);
-		if(contactExist)
-			return "exist";
-	    Contact newContact = new Contact();
-	    newContact.setUsername(username);
-	    newContact.setContactUsername(contactUsername);
-		contactRepository.save(newContact);
-		Contact saved = contactRepository.findByUsernameAndContactUsername(username, contactUsername);
-		if(saved != null)
-			return "success";
-		else
-			return "error";
 	}
 	
 	@RequestMapping(value="/edit", method=RequestMethod.POST)
@@ -163,7 +141,7 @@ public class ProfileController {
 		return usersNamesList.contains(username);
 	}
     
-    private List<UserMessage> groupingMessages(
+    private List<ChatMessage> groupingMessages(
 			List<ChatMessage> chatMessagesSended,
 			List<ChatMessage> chatMessagesReceived, String username) {
 		List<ChatMessage> chatMessages = new ArrayList<ChatMessage>(chatMessagesSended);
@@ -174,17 +152,14 @@ public class ProfileController {
 		        return o1.getDateTime().compareTo(o2.getDateTime());
 		    }
 		});
-		List<UserMessage> userMessages = new ArrayList<UserMessage>();
 		for(Iterator<ChatMessage> i = chatMessages.iterator(); i.hasNext(); ) {
 		    ChatMessage chatMessage = i.next();
 		    if(chatMessage.getSendTo().equals(username)){
 			    chatMessage.setOpen(true);
 			    chatMessageRepository.save(chatMessage);
 		    }
-		    UserMessage userMessage = new UserMessage(chatMessage, username);
-		    userMessages.add(userMessage);
 		}
-		return userMessages;
+		return chatMessages;
 	}
   
 }

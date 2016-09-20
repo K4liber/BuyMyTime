@@ -3,15 +3,16 @@ package data.views;
 import java.util.List;
 
 import data.entities.UserProfile;
+import data.messages.ChatMessage;
 
 public class UserContact {
 
 	private UserProfile profile;
-	private List<UserMessage> userMessages;
+	private List<ChatMessage> chatMessages;
 	
-	public UserContact(UserProfile profile, List<UserMessage> userMessages){
+	public UserContact(UserProfile profile, List<ChatMessage> chatMessages){
 		this.profile = profile;
-		this.userMessages = userMessages;
+		this.setChatMessages(chatMessages);
 	}
 	
 	public UserProfile getProfile() {
@@ -20,11 +21,14 @@ public class UserContact {
 	public void setProfile(UserProfile profile) {
 		this.profile = profile;
 	}
-	public List<UserMessage> getUserMessages() {
-		return userMessages;
+
+	public List<ChatMessage> getChatMessages() {
+		return chatMessages;
 	}
-	public void setUserMessages(List<UserMessage> userMessages) {
-		this.userMessages = userMessages;
+
+	public void setChatMessages(List<ChatMessage> chatMessages) {
+		this.chatMessages = chatMessages;
 	}
+
 	
 }

@@ -140,11 +140,17 @@ body {
 .contactsLeftPanel {
 	float:left;
 	width:30%;
+	min-width:30%;
+	height:80%;
+	min-height:80%;
 }
 
 .contactsRightPanel{
-	float:left;
+	float:right;
 	width:60%;
+	min-width:60%;
+	height:80%;
+	min-height:80%;
 	margin:5%;
 }
 
@@ -196,14 +202,12 @@ body {
 }
 
 .chatMessagesList{
-	display: table;
 	width: 100%;
 	height: 60px;
 }
 
 .chatMessage {
 	width: 100%;
-    display: table-cell;
     vertical-align: bottom;
 }
 
