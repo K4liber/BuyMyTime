@@ -96,18 +96,24 @@ function addNewCardHtml(){
 	});
 }
 
-function contactsHtml(userProfiles) {
+function messagesHtml(contacts) {
 	var h = [''];
 	h.push('<div class="contactsPanel">');
 	h.push('<div class="contactsLeftPanel">');
-	userProfiles.forEach(function(userProfile){
+	contacts.forEach(function(contactInfo){
 		h.push('<div class="contactPanel">');
-		h.push('<ul style="list-style-type:none">');
-		if(userProfile.status)
-			h.push('<div id="contactUsername"><li style="color:green;">'+ userProfile.username + '<\/li><\/div>');
-		else
-			h.push('<div id="contactUsername"><li>'+ userProfile.username + '<\/li><\/div>');
-		h.push('<\/ul>');
+		if(contactInfo.status){
+			if(!contactInfo.open)
+				h.push('<span class="contactSpan" style="color:white;">'+ contactInfo.username + '<\/span> Online');
+			else
+				h.push('<span class="contactSpan" >'+ contactInfo.username + '<\/span> Online');
+		}
+		else{
+			if(!contactInfo.open)
+				h.push('<span class="contactSpan" style="color:green;">'+ contactInfo.username + '<\/span>');
+			else
+				h.push('<span class="contactSpan">'+ contactInfo.username + '<\/span>');
+		}
 		h.push('<\/div>');
 	});
 	h.push('<\/div>');
@@ -117,9 +123,22 @@ function contactsHtml(userProfiles) {
 	$("#chatContents").hide();
 	$("#contents").show();
 	$(document).ready(function() {
-		$("li").click(function(){
+		$(".contactSpan").click(function(){
 			getContact(this.innerHTML);
+			this.style.color = "black"; 
 	    });
+	});
+}
+
+function messagesOverlapHtml(){
+	getMessagesCount(function(count){
+		var h =[''];
+		if (count != 0){
+			h.push(count);
+			document.getElementById('newMessages').innerHtml = h.join('');
+		} else {
+			$("#newMessages").remove();
+		}
 	});
 }
 
@@ -152,7 +171,7 @@ function cardsHtml(cards) {
 	var h = [''];
 	h.push('<div class="categoryLeftPanel">');
 	cards.forEach(function(card){
-		h.push('<div id="card' + card.id + '"><a><h2>' + card.title + '<\/h2><\/a>');
+		h.push('<div id="card' + card.id + '" class="card"><a><h2>' + card.title + '<\/h2><\/a>');
 		h.push('<img class="profileImage" src="/BuyMyTime/resources/img/' + card.authorImageName + '"/>');
 		h.push('<button onClick="getUserProfile(\'' + card.userNick + '\')">' + card.userNick + '<\/button>');
 		h.push('<a>' + card.description + '<\/a><\/div>');
@@ -202,7 +221,7 @@ function categoryProfileHtml(userProfile){
 				editProfile(userProfile);
 		    });
 			$("#addCard").click(function(){
-				getAddCard();
+				addCard();
 		    });
 		}
 	});
@@ -217,7 +236,6 @@ function aboutHtml(about) {
 }
 
 function profileHtml(userProfile) {
-	console.log(userProfile);
 	var h = [''];
 	h.push('<div><span id="username">' + userProfile.username + '</span><\/div>');
 	h.push('<div><img class="profileImage" src="/BuyMyTime/resources/img/' + userProfile.imageName + '"/><\/div>');
@@ -352,7 +370,7 @@ function chatContentHtml(username) {
 			var formdata = new FormData(this);
 			postFileMessage(formdata, function(fileName){
 			    $("#chatMessagesList")
-				.append('<div><span onClick="downloadFile(\'' 
+				.append('<div class="chatMessage"><span onClick="downloadFile(\'' 
 						+ fileName + '\', \'' + $('#upload').val() + '\')" id="' 
 						+ $('#upload').val() + '" class="messageFile">' 
 						+ $('#upload').val() + '</span></div>');

@@ -62,50 +62,9 @@ public class CardController {
 		return cards;
 	}
 	
-	@RequestMapping(value="/newcard", method=RequestMethod.GET)
-	public String showCardForm(Principal principal, Model model){
-		CardModel cardModel = new CardModel();
-		cardModel.setCard(new Card());
-		List<Category> categories = categoryRepository.findAll();
-		model.addAttribute("cardModel", cardModel);
-		model.addAttribute("categories", categories);
-		model.addAttribute("username", principal.getName());
-		return "cardForm";
-	}
-	
 	@RequestMapping(value = { "/newcard" }, method = RequestMethod.POST)
 	public String newCard(@RequestBody CardModel cardModel,
 			RedirectAttributes model, Principal principal) throws Exception {
-		System.out.println("Nazzwa: " + cardModel.getCard().getCategoryName());
-
-		
-		Card cardFromModel = cardModel.getCard();
-		User user = userRepository.findByUsername(principal.getName());
-		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
-		cardFromModel.setUserId(user.getId());
-		cardFromModel.setUserNick(user.getUsername());
-		cardFromModel.setAuthorImageName(userProfile.getImageName());
-		Card savedCard = cardRepository.save(cardModel.getCard());
-		
-		String tagsTable[] = cardModel.getTags().split(" ");
-
-		for(int ii=0;ii<tagsTable.length;ii++){
-			CardTag cardTag = new CardTag();
-			cardTag.setTitle(tagsTable[ii]);
-			CardTag savedCardTag = cardTagRepository.save(cardTag);
-			TagToCard tagToCard = new TagToCard();
-			tagToCard.setCardId(savedCard.getId());
-			tagToCard.setTagId(savedCardTag.getId());
-			tagToCardRepository.save(tagToCard);
-		}
-		
-	    return "home";
-	}
-	
-	@RequestMapping(value = { "/example" }, method = RequestMethod.POST)
-	public String example(@RequestBody CardModel cardModel,
-			RedirectAttributes model, Principal principal) throws Exception {
-
 		Card cardFromModel = cardModel.getCard();
 		User user = userRepository.findByUsername(principal.getName());
 		UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
@@ -123,7 +82,6 @@ public class CardController {
 			tagToCard.setTagId(savedCardTag.getId());
 			tagToCardRepository.save(tagToCard);
 		}
-		
 	    return "home";
 	}
 }

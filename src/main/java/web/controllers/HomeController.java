@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import repositories.CategoryRepository;
+import repositories.ChatMessageRepository;
 import repositories.PeerConnectionRepository;
 import repositories.TransactionRepository;
 import repositories.UserRepository;
@@ -19,6 +20,7 @@ import data.entities.Category;
 import data.entities.PeerConnection;
 import data.entities.Transaction;
 import data.entities.User;
+import data.messages.ChatMessage;
 
 @RequestMapping
 @Controller
@@ -32,6 +34,8 @@ public class HomeController {
 	private TransactionRepository transactionRepository;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	ChatMessageRepository chatMessageRepository;
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	public String home(Principal principal, Model model){
@@ -40,12 +44,18 @@ public class HomeController {
 		model.addAttribute("user", new User());
 		if(principal != null){
 			model.addAttribute("username", principal.getName());
-		}
-		if(principal != null)
 			endAllSuspendedConnections(principal.getName());
+			model.addAttribute("newMessages", lookForNewMessages(principal.getName()));
+		}	
 		return "home";
 	}
 	
+	private int lookForNewMessages(String username) {
+		List<ChatMessage> notOpenMessages= chatMessageRepository.findAllBySendToAndOpen(username, false);
+		System.out.println(notOpenMessages.size());
+		return notOpenMessages.size();
+	}
+
 	private void endAllSuspendedConnections(String username) {
 		List<PeerConnection> peerConnections = peerConnectionRepository
 				.findAllByPayingAndEnded(username, false);

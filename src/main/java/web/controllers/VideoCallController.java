@@ -144,10 +144,22 @@ public class VideoCallController {
     }
     
     @MessageMapping("/message")
+    public void message(Principal principal, ChatMessage message) throws InterruptedException{ 
+        Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = formatter.format(new Date());
+        message.setDateTime(date);
+        message.setOpen(false);
+        chatMessageRepository.save(message);
+        ChatMessage chatMessage = chatMessageRepository.findByDateTimeAndSendTo(date, message.getSendTo());
+        messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", chatMessage);
+    }
+    
+    @MessageMapping("/chatMessage")
     public void chatMessage(Principal principal, ChatMessage message) throws InterruptedException{ 
         Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = formatter.format(new Date());
         message.setDateTime(date);
+        message.setOpen(true);
         chatMessageRepository.save(message);
         ChatMessage chatMessage = chatMessageRepository.findByDateTimeAndSendTo(date, message.getSendTo());
         messaging.convertAndSendToUser(message.getSendTo(), "/queue/chat", chatMessage);

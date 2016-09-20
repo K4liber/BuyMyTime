@@ -101,10 +101,10 @@ function handleChatMessage(chatMessage){
 	var message = JSON.parse(chatMessage.body);
 	if(message.type == "file"){
 		$("#messagesList" + message.sendFrom)
-			.append('<div style="color:green;"><span id="messageFile' + message.id + '" class="messageFile">' 
+			.append('<div style="color:green;" class="chatMessage"><span id="messageFile' + message.id + '" class="messageFile">' 
 				+ message.messageContent + '</span></div>');
 		$("#chatMessagesList")
-			.append('<div style="color:green;"><span id="messageFile' + message.id + '" class="messageFile">' 
+			.append('<div style="color:green;" class="chatMessage"><span id="messageFile' + message.id + '" class="messageFile">' 
 					+ message.messageContent + '</span></div>');
 		$(document).ready(function(){
 			$("#messageFile" + message.id).click(function(){
@@ -293,18 +293,18 @@ function editProfile(userProfile){
 function sendChatMessage(sendTo, messageContent){
 	console.log(sendTo);
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList" + sendTo).append('<div>' + messageContent + '</div>');
-	$("#chatMessagesList").append('<div>' + messageContent + '</div>');
+	$("#messagesList" + sendTo).append('<div class="chatMessage">' + messageContent + '</div>');
+	$("#chatMessagesList").append('<div class="chatMessage">' + messageContent + '</div>');
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
-    subscribeStomp.send("/BuyMyTime/message", {}, payload);	
+    subscribeStomp.send("/BuyMyTime/chatMessage", {}, payload);	
 }
 
 function sendMessage(sendTo){
 	var messageContent = $('#messageContent').val();
 	var sendFrom = document.getElementById("userNick").innerText;
-	$("#messagesList" + sendTo).append('<div>' + messageContent + '</div>').scrollTop("0");
-	$("#chatMessagesList").append('<div>' + messageContent + '</div>').scrollTop("0");
+	$("#messagesList" + sendTo).append('<div class="chatMessage">' + messageContent + '</div>').scrollTop("0");
+	$("#chatMessagesList").append('<div class="chatMessage">' + messageContent + '</div>').scrollTop("0");
 	var chatMessage = {'sendFrom': sendFrom, 'sendTo': sendTo ,'messageContent': messageContent};
     var payload = JSON.stringify(chatMessage);
     subscribeStomp.send("/BuyMyTime/message", {}, payload);	

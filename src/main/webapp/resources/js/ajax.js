@@ -3,7 +3,17 @@ function getEndCall(username){
         type : "GET",
         url : "endCall/" + username,
         success: function(data){
-        	console.log(data);
+        	
+        }
+    });
+}
+
+function getMessagesCount(onSucces){
+	$.ajax({
+        type : "GET",
+        url : "messagesCount",
+        success: function(data){
+        	onSucces(data);
         }
     });
 }
@@ -128,12 +138,12 @@ function getUserProfile(username){
     });
 }
 
-function getContacts(){
+function getMessages(){
 	$.ajax({
         type : "GET",
-        url : "contacts",
+        url : "messages",
         success: function(data){
-        	contactsHtml(data);
+        	messagesHtml(data);
         }
     });
 }
@@ -181,6 +191,7 @@ function getContact(contactUsername){
         type : "GET",
         url : "contact/" + contactUsername,
         success: function(data){
+        	messagesOverlapHtml();
         	contactHtml(data);
         }
     });

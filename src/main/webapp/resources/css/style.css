@@ -125,6 +125,7 @@ body {
 }
 
 .chatContent {
+	display: table;
 	width: 60%;
 	min-width: 60%;
 	overflow:auto;
@@ -152,6 +153,12 @@ body {
 	background-color: rgb(230,230,230);
 	margin:5%;
 	height:40px;
+}
+
+.contactSpan{
+	cursor: pointer;
+	height: 100%;
+	color: black;
 }
 
 .messagesContent{
@@ -185,9 +192,26 @@ body {
 
 .messageFile{
 	cursor: pointer;
+	color: rgb(0,0,200);
 }
 
 .chatMessagesList{
+	display: table;
 	width: 100%;
-	height: 50px;
+	height: 60px;
+}
+
+.chatMessage {
+	width: 100%;
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+.card {
+	cursor: pointer;
+	background-color: rgb(10,10,10);
+}
+
+.card:hover {
+	background-color: rgb(20,20,20);
 }

@@ -31,6 +31,7 @@ import data.entities.Contact;
 import data.entities.User;
 import data.entities.UserProfile;
 import data.messages.ChatMessage;
+import data.views.ContactInfo;
 import data.views.UserContact;
 import data.views.UserMessage;
 
@@ -48,30 +49,48 @@ public class ProfileController {
 	@Autowired
 	ChatMessageRepository chatMessageRepository;
 	
-	@RequestMapping(value="/contacts", method=RequestMethod.GET)
+	@RequestMapping(value="/messagesCount", method=RequestMethod.GET)
 	@ResponseBody
-	public List<UserProfile> getContacts(Principal principal, Model model){
+	public Long getMessagesCount(Principal principal){
+		if(principal == null)
+			return null;
+		List<ChatMessage> chatMessages = chatMessageRepository
+				.findAllBySendToAndOpen(principal.getName(), false);
+		return (long) chatMessages.size();
+	}
+	
+	@RequestMapping(value="/messages", method=RequestMethod.GET)
+	@ResponseBody
+	public List<ContactInfo> getContactsInfo(Principal principal, Model model){
+		if(principal == null)
+			return null;
 		String username = principal.getName();
-		List<UserProfile> userProfileList = new ArrayList<UserProfile>();
-		List<Contact> contactList = contactRepository.findAllByUsername(username);
-		List<Contact> contactList2 = contactRepository.findAllByContactUsername(username);
-		for(Iterator<Contact> i = contactList.iterator(); i.hasNext(); ) {
-		    Contact item = i.next();
-		    String contactUsername = item.getContactUsername();
-		    User user = userRepository.findByUsername(contactUsername);
-		    UserProfile profile = new UserProfile(user);
-		    profile.setStatus(isOnline(contactUsername));
-		    userProfileList.add(profile);
-		}	
-		for(Iterator<Contact> i = contactList2.iterator(); i.hasNext(); ) {
-		    Contact item = i.next();
-		    String contactUsername = item.getUsername();
-		    User user = userRepository.findByUsername(contactUsername);
-		    UserProfile profile = new UserProfile(user);
-		    profile.setStatus(isOnline(contactUsername));
-		    userProfileList.add(profile);
-		}	
-		return userProfileList;
+		List<ContactInfo> contactInfoList = new ArrayList<ContactInfo>();
+		List<String> helperList = new ArrayList<String>();
+		List<ChatMessage> chatMessages = chatMessageRepository
+				.findAllBySendFrom(username);
+		chatMessages.addAll(chatMessageRepository.findAllBySendTo(username));
+		for (Iterator<ChatMessage> i = chatMessages.iterator(); i.hasNext(); ) {
+			ChatMessage item = i.next();
+			if (username.equals(item.getSendFrom())){
+				if(!helperList.contains(item.getSendTo())){
+					ContactInfo contact = new ContactInfo(item.getSendTo(), item.isOpen());
+					contactInfoList.add(contact);
+					helperList.add(item.getSendTo());
+				}
+			}
+			if (username.equals(item.getSendTo())){
+				if(!helperList.contains(item.getSendFrom())){
+					ContactInfo contact = new ContactInfo(item.getSendFrom(), item.isOpen());
+					contactInfoList.add(contact);
+					helperList.add(item.getSendFrom());
+				}
+			}
+		}
+		for (int i=0; i<contactInfoList.size(); i++) {
+			contactInfoList.get(i).setStatus(isOnline(contactInfoList.get(i).getUsername()));
+		}
+		return contactInfoList;
 	}
 	
 	@RequestMapping(value="/profile/{username}", method=RequestMethod.GET)
@@ -158,9 +177,12 @@ public class ProfileController {
 		List<UserMessage> userMessages = new ArrayList<UserMessage>();
 		for(Iterator<ChatMessage> i = chatMessages.iterator(); i.hasNext(); ) {
 		    ChatMessage chatMessage = i.next();
+		    if(chatMessage.getSendTo().equals(username)){
+			    chatMessage.setOpen(true);
+			    chatMessageRepository.save(chatMessage);
+		    }
 		    UserMessage userMessage = new UserMessage(chatMessage, username);
 		    userMessages.add(userMessage);
-		    System.out.println(userMessage.getMessage());
 		}
 		return userMessages;
 	}

@@ -6,7 +6,10 @@
 	</div>
 	<div id="menu" sec:authorize="hasAuthority('ROLE_USER')  && isAuthenticated()">
 		<button id="homeButton" class="ui-button ui-widget ui-corner-all" onClick="getHome()">Home</button>
-		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getContacts()">Contacts</button>
+		<button th:if="${newMessages}==0" id="messagesButton" class="ui-button ui-widget ui-corner-all" onClick="getMessages()">
+		Messages</button>
+		<button th:unless="${newMessages}==0" id="messagesButton" class="ui-button ui-widget ui-corner-all" onClick="getMessages()">
+		Messages <div id="newMessages" style="background-color:white; font-size:80%;" th:text="${newMessages}"></div></button>
 		<button id="profileButton" class="ui-button ui-widget ui-corner-all" onClick="getProfile()">Profile</button>
 		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getCards()">Cards</button>
 		<button id="cardsButton" class="ui-button ui-widget ui-corner-all" onClick="getIssues()">Issues</button>
