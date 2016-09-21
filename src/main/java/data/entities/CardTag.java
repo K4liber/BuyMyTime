@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public class CardTag {
 	
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.TABLE)
 	private Long id;
 	
 	@NotNull

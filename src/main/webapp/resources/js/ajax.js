@@ -27,10 +27,10 @@ function postProfileImage(formData){
         contentType: false,
         cache: false,
         processData: false,
-        success: function(){
-            alert("file successfully submitted");
+        success: function(data){
+        	profileHtml(data);
         },error: function(){
-            alert("okey");
+            alert("something wrong");
         }
 	});
 }

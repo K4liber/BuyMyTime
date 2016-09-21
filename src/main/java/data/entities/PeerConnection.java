@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
@@ -16,7 +17,7 @@ import data.messages.AnswerPaidMessage;
 public class PeerConnection {
 	
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.TABLE)
 	private Long id;
 	private String paying;
 	private String receiver;

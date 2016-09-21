@@ -37,7 +37,7 @@ public class SessionListener implements HttpSessionListener{
     @Override
     public void sessionDestroyed(HttpSessionEvent event) {
     	System.out.println("==== Session is destroyed ====");
-    	if((SecurityContext)SecurityContextHolder.getContext() != null){
+    	if(SecurityContextHolder.getContext().getAuthentication() != null){
 	    	User user = (User) ((SecurityContext)SecurityContextHolder.getContext())
 	    			.getAuthentication().getPrincipal();
 	    	String username = user.getUsername();

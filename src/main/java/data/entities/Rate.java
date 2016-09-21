@@ -9,7 +9,7 @@ import javax.persistence.Id;
 public class Rate {
 	
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.TABLE)
 	private Long id;
 	private Long quantity;
 	private Long price;

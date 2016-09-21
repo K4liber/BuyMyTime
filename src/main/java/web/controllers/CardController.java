@@ -25,12 +25,12 @@ import repositories.TagToCardRepository;
 import repositories.UserProfileRepository;
 import repositories.UserRepository;
 import data.entities.Card;
-import data.entities.CardModel;
 import data.entities.CardTag;
 import data.entities.Category;
 import data.entities.TagToCard;
 import data.entities.User;
 import data.entities.UserProfile;
+import data.views.CardModel;
 
 @Controller
 public class CardController {

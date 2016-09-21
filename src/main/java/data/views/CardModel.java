@@ -1,4 +1,6 @@
-package data.entities;
+package data.views;
+
+import data.entities.Card;
 
 public class CardModel {
 	

@@ -2,8 +2,8 @@ package data.views;
 
 import java.util.List;
 
+import data.entities.ChatMessage;
 import data.entities.UserProfile;
-import data.messages.ChatMessage;
 
 public class UserContact {
 

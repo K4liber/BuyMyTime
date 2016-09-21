@@ -17,10 +17,10 @@ import repositories.PeerConnectionRepository;
 import repositories.TransactionRepository;
 import repositories.UserRepository;
 import data.entities.Category;
+import data.entities.ChatMessage;
 import data.entities.PeerConnection;
 import data.entities.Transaction;
 import data.entities.User;
-import data.messages.ChatMessage;
 
 @RequestMapping
 @Controller
@@ -52,7 +52,6 @@ public class HomeController {
 	
 	private int lookForNewMessages(String username) {
 		List<ChatMessage> notOpenMessages= chatMessageRepository.findAllBySendToAndOpen(username, false);
-		System.out.println(notOpenMessages.size());
 		return notOpenMessages.size();
 	}
 

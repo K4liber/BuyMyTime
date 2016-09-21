@@ -27,10 +27,10 @@ import repositories.ChatMessageRepository;
 import repositories.ContactRepository;
 import repositories.UserProfileRepository;
 import repositories.UserRepository;
+import data.entities.ChatMessage;
 import data.entities.Contact;
 import data.entities.User;
 import data.entities.UserProfile;
-import data.messages.ChatMessage;
 import data.views.ContactInfo;
 import data.views.UserContact;
 
@@ -115,7 +115,8 @@ public class ProfileController {
 	}
 	
 	@RequestMapping(value="/edit", method=RequestMethod.POST)
-	public String handleFileUpload(@RequestParam("file") MultipartFile file,
+	@ResponseBody
+	public UserProfile handleFileUpload(@RequestParam("file") MultipartFile file,
         Principal principal, HttpServletRequest request) throws IllegalStateException, IOException {
 		String realPathtoUploads = request.getSession().getServletContext().getRealPath("/resources/img");
         if(! new File(realPathtoUploads).exists())
@@ -127,7 +128,7 @@ public class ProfileController {
         UserProfile userProfile = userProfileRepository.findByUsername(principal.getName());
         userProfile.setImageName(fileName);
         userProfileRepository.save(userProfile);
-		return "home";
+		return userProfile;
 	}
 	
     public boolean isOnline(String username){

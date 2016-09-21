@@ -26,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import data.entities.ChatMessage;
 import data.entities.PeerConnection;
 import data.entities.Transaction;
 import data.entities.User;
@@ -33,7 +34,6 @@ import data.entities.UserProfile;
 import data.messages.AnswerCallMessage;
 import data.messages.AnswerPaidMessage;
 import data.messages.CallMessage;
-import data.messages.ChatMessage;
 import data.messages.CommuniqueMessage;
 import data.messages.EndCallMessage;
 import data.messages.PaidMessage;

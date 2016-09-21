@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 public class TagToCard {
 	
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.TABLE)
 	private Long id;
 	
 	@NotNull
